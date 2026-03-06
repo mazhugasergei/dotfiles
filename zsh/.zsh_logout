@@ -1,0 +1,4 @@
+# clear the screen and the scrollback buffer
+if [ "$SHLVL" -eq 1 ]; then
+    printf "\033c"
+fi

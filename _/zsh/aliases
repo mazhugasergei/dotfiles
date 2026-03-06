@@ -1,0 +1,30 @@
+alias whereami='curl ipinfo.io'
+alias ls='ls -Ap1'
+alias mkcd='f() { mkdir -p "$1" && cd "$1"; }; f'
+alias open='explorer.exe'
+alias vpn='adguardvpn-cli'
+alias vpnc='adguardvpn-cli connect -l FRANKFURT'
+alias vpnd='adguardvpn-cli disconnect'
+alias dcu='docker compose up'
+alias dcd='docker compose down'
+alias dcdv='docker compose down --volumes'
+alias dcud='docker compose up --detach'
+alias dcub='docker compose up --build'
+alias dcubd='docker compose up --build --detach'
+alias npmise="npm install --save-exact"
+alias cna='npx create-next-app --empty'
+alias python=python3
+
+# windsurf
+if [[ -n "$WSL_DISTRO_NAME" ]]; then
+  # WSL: define ws() to launch windsurf in VS Code Remote for the current WSL distro
+  ws() {
+    bash -c '
+      distro="Debian"
+      windsurf --folder-uri "vscode-remote://wsl+$distro$1"
+    ' _ "${1:+$(realpath "$1")}"
+  }
+else
+  # native Linux: make simple alias
+  alias ws='windsurf'
+fi
