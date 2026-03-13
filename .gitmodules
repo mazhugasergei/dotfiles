@@ -1,0 +1,3 @@
+[submodule "_/git-mcp"]
+	path = _/git-mcp
+	url = https://github.com/mazhugasergei/git-mcp
