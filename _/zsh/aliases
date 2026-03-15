@@ -21,7 +21,15 @@ if [[ -n "$WSL_DISTRO_NAME" ]]; then
   ws() {
     bash -c '
       distro="Debian"
-      windsurf --folder-uri "vscode-remote://wsl+$distro$1"
+      if [[ -n "$1" ]]; then
+        if [[ ! -d "$1" ]]; then
+          echo "Error: Directory \"$1\" does not exist"
+          exit 1
+        fi
+        windsurf --folder-uri "vscode-remote://wsl+$distro$1"
+      else
+        windsurf
+      fi
     ' _ "${1:+$(realpath "$1")}"
   }
 else
