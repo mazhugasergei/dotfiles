@@ -48,6 +48,7 @@ fi
 
 log "Running stow..."
 cd ~/dotfiles
-stow zsh
+stow zsh git
+cd ..
 
 log "Installation complete"
