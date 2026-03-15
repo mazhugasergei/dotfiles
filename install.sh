@@ -47,8 +47,6 @@ if ! command -v uv &> /dev/null; then
 fi
 
 log "Running stow..."
-cd ~/dotfiles
-stow zsh git
-cd ..
+stow ~/dotfiles/zsh ~/dotfiles/git
 
 log "Installation complete"
