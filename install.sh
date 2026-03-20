@@ -46,6 +46,11 @@ if ! command -v uv &> /dev/null; then
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
+log "Installing AdGuard VPN CLI..."
+sudo apt update
+sudo apt install -y curl
+curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v
+
 log "Running stow..."
 stow zsh git
 
