@@ -9,6 +9,9 @@ log() {
 log "Installing zsh..."
 sudo apt update && sudo apt install -y zsh
 
+log "Setting zsh as default shell..."
+sudo chsh -s $(which zsh) $USER
+
 log "Removing bash files..."
 rm -f ~/.bashrc ~/.bash_profile ~/.bash_logout ~/.bash_history
 
