@@ -49,11 +49,28 @@ declare -A to_install
 declare -A already_installed
 
 logger info "Checking package status..."
+
+# Check apt packages
 for package in "${apt_packages[@]}"; do
 	if ! dpkg -l | grep -q "^ii  $package "; then
-		to_install["$package"]="$package"
+		to_install["$package"]="apt"
 	else
-		already_installed["$package"]="$package"
+		already_installed["$package"]="apt"
+	fi
+done
+
+# Check non-apt packages
+non_apt_packages=(
+	"docker"
+	"node"
+	"adguardvpn-cli"
+)
+
+for package in "${non_apt_packages[@]}"; do
+	if ! which "$package" &> /dev/null; then
+		to_install["$package"]="custom"
+	else
+		already_installed["$package"]="custom"
 	fi
 done
 
@@ -81,11 +98,13 @@ done
 # Configuration for table formatting
 min_pkg_col_width=23
 min_status_col_width=17
+min_method_col_width=8
 col_padding=2
 
 # Ensure minimum widths and add padding
 pkg_col_width=$((max_pkg_length + col_padding))
 status_col_width=$((max_status_length + col_padding))
+method_col_width=$((min_method_col_width + col_padding))
 if [ $pkg_col_width -lt $min_pkg_col_width ]; then
 	pkg_col_width=$min_pkg_col_width
 fi
@@ -94,21 +113,23 @@ if [ $status_col_width -lt $min_status_col_width ]; then
 fi
 
 # Build table dynamically
-top_border="┌─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┬─$(printf '─%.0s' $(seq 1 $status_col_width))─┐"
-header="│ $(printf "%-${pkg_col_width}s" "Package Name") │ $(printf "%-${status_col_width}s" "Status") │"
-middle_border="├─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┼─$(printf '─%.0s' $(seq 1 $status_col_width))─┤"
-bottom_border="└─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┴─$(printf '─%.0s' $(seq 1 $status_col_width))─┘"
+top_border="┌─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┬─$(printf '─%.0s' $(seq 1 $status_col_width))─┬─$(printf '─%.0s' $(seq 1 $method_col_width))─┐"
+header="│ $(printf "%-${pkg_col_width}s" "Package Name") │ $(printf "%-${status_col_width}s" "Status") │ $(printf "%-${method_col_width}s" "Method") │"
+middle_border="├─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┼─$(printf '─%.0s' $(seq 1 $status_col_width))─┼─$(printf '─%.0s' $(seq 1 $method_col_width))─┤"
+bottom_border="└─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┴─$(printf '─%.0s' $(seq 1 $status_col_width))─┴─$(printf '─%.0s' $(seq 1 $method_col_width))─┘"
 
 echo "$top_border"
 echo "$header"
 echo "$middle_border"
 
 for package in "${!already_installed[@]}"; do
-	echo "│ $(printf "%-${pkg_col_width}s" "$package") │ ✓ Already installed │"
+	method="${already_installed[$package]}"
+	echo "│ $(printf "%-${pkg_col_width}s" "$package") │ ✓ Already installed │ $(printf "%-${method_col_width}s" "$method") │"
 done
 
 for package in "${!to_install[@]}"; do
-	echo "│ $(printf "%-${pkg_col_width}s" "$package") │ ○ To be installed  │"
+	method="${to_install[$package]}"
+	echo "│ $(printf "%-${pkg_col_width}s" "$package") │ ○ To be installed  │ $(printf "%-${method_col_width}s" "$method") │"
 done
 
 echo "$bottom_border"
@@ -118,48 +139,40 @@ echo ""
 if [ ${#to_install[@]} -gt 0 ]; then
 	logger info "Installing missing packages..."
 	for package in "${!to_install[@]}"; do
-		logger info "Installing $package..."
-		sudo apt-get install -yqq "$package"
-		logger done "$package installed"
+		method="${to_install[$package]}"
+		case "$method" in
+			"apt")
+				logger info "Installing $package via apt..."
+				sudo apt-get install -yqq "$package"
+				logger done "$package installed"
+				;;
+			"custom")
+				case "$package" in
+					"docker")
+						logger info "Installing $package via official script..."
+						curl -fsSL https://get.docker.com -o get-docker.sh
+						sh get-docker.sh
+						sudo usermod -aG docker $USER
+						rm get-docker.sh
+						logger done "$package installed"
+						;;
+					"node")
+						logger info "Installing $package via NodeSource..."
+						curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+						sudo apt-get install -yqq nodejs
+						logger done "$package installed"
+						;;
+					"adguardvpn-cli")
+						logger info "Installing $package via official script..."
+						curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v
+						logger done "$package installed"
+						;;
+				esac
+				;;
+		esac
 	done
 else
 	logger done "All packages are already installed"
-fi
-
-# docker
-if ! command -v docker &> /dev/null; then
-	logger info "Installing docker..."
-	curl -fsSL https://get.docker.com -o get-docker.sh
-	sh get-docker.sh
-	sudo usermod -aG docker $USER
-	rm get-docker.sh
-else
-	logger done "docker is already installed"
-fi
-
-# node
-if ! command -v node &> /dev/null; then
-	logger info "Installing node..."
-	curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-	sudo apt-get install -yqq nodejs
-else
-	logger done "node is already installed"
-fi
-
-# uv
-# if ! command -v uv &> /dev/null; then
-# 	logger info "Installing uv..."
-# 	curl -LsSf https://astral.sh/uv/install.sh | sh
-# else
-# 	logger done "uv is already installed"
-# fi
-
-# adguardvpn-cli
-if ! command -v adguardvpn-cli &> /dev/null; then
-	logger info "Installing AdGuard VPN CLI..."
-	curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v
-else
-	logger done "AdGuard VPN CLI is already installed"
 fi
 
 # stow
