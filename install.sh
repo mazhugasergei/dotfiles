@@ -64,6 +64,7 @@ non_apt_packages=(
 	"docker"
 	"node"
 	"adguardvpn-cli"
+	"uv"
 )
 
 for package in "${non_apt_packages[@]}"; do
@@ -165,6 +166,11 @@ if [ ${#to_install[@]} -gt 0 ]; then
 					"adguardvpn-cli")
 						logger info "Installing $package via official script..."
 						curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v
+						logger done "$package installed"
+						;;
+					"uv")
+						logger info "Installing $package via official script..."
+						curl -sSfL https://astral.sh/uv/install.sh | sh
 						logger done "$package installed"
 						;;
 				esac
