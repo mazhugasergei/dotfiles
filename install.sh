@@ -96,9 +96,13 @@ stow zsh git
 logger done "stow completed"
 
 # zsh
-logger info "Setting zsh as default shell..."
-sudo chsh -s $(which zsh) $USER
-logger done "zsh set as default shell"
+if [ "$SHELL" != "$(which zsh)" ]; then
+	logger info "Setting zsh as default shell..."
+	sudo chsh -s $(which zsh) $USER
+	logger done "zsh set as default shell"
+else
+	logger done "zsh is already the default shell"
+fi
 
 # bash
 logger info "Removing bash files..."
