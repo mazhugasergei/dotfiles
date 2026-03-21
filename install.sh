@@ -124,7 +124,7 @@ echo "$middle_border"
 
 for package in "${!already_installed[@]}"; do
 	method="${already_installed[$package]}"
-	echo "│ $(printf "%-${pkg_col_width}s" "$package") │ ✓ Already installed │ $(printf "%-${method_col_width}s" "$method") │"
+	echo "│ $(printf "%-${pkg_col_width}s" "$package") │ \033[32m✓ Already installed\033[0m │ $(printf "%-${method_col_width}s" "$method") │"
 done
 
 for package in "${!to_install[@]}"; do
