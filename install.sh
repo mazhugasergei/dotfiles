@@ -6,7 +6,7 @@ set -e
 SKIP_INTRO=false
 while [[ $# -gt 0 ]]; do
 	case "$1" in
-		--skip-intro|-s)
+		-s|--skip)
 			SKIP_INTRO=true
 			shift
 			;;
@@ -14,18 +14,18 @@ while [[ $# -gt 0 ]]; do
 			echo "Usage: $0 [OPTIONS]"
 			echo ""
 			echo "OPTIONS:"
-			echo "  -s, --skip-intro    Skip the intro typewriter effect"
-			echo "  -h, --help          Show this help message"
+			echo "  -s, --skip         Skip the intro and outro typewriter effects"
+			echo "  -h, --help         Show this help message"
 			echo ""
 			echo "Examples:"
-			echo "  $0                  Run full installation with intro"
-			echo "  $0 -s               Skip intro and go straight to installation"
+			echo "  $0                    Run full installation with effects"
+			echo "  $0 -s                Skip effects and go straight to installation"
 			echo ""
 			exit 0
 			;;
 		*)
 			echo "Unknown option: $1"
-			echo "Usage: $0 [-s|--skip-intro] [-h|--help]"
+			echo "Usage: $0 [-s|--skip] [-h|--help]"
 			exit 1
 			;;
 	esac
@@ -43,12 +43,16 @@ if ! sudo -n true 2>/dev/null; then
 	logger done "Sudo access verified"
 fi
 
+# Typewriter Configuration
+TYPE_SPEED=0.05
+TYPE_LINES_DELAY=1
+
 # Typewriter Function
-# Usage: type_out "text" speed
+# Usage: type_out "text"
 type_out() {
   echo -e "$1" | while IFS= read -r -n1 char; do
     printf "%s" "$char"
-    sleep 0.05
+    sleep "$TYPE_SPEED"
   done
   printf "\n"
 }
@@ -64,8 +68,8 @@ if [ "$SKIP_INTRO" = false ]; then
 	echo ""
 	sleep 1
 	for line in "${intro_strings[@]}"; do
-		type_out "$line" 0.04
-		sleep 1
+		type_out "$line"
+		sleep "$TYPE_LINES_DELAY"
 	done
 	echo ""
 fi
@@ -284,4 +288,20 @@ else
 fi
 
 # complete
+if [ "$SKIP_INTRO" = false ]; then
+	# The Outro
+	outro_strings=(
+		"Miraculous. It's almost as if a competent professional handled the setup."
+		"I've managed to save this rig from certain mediocrity. You're quite welcome."
+		"Everything is in its right place. Simply marvelous. Wallop."
+	)
+	
+	echo ""
+	for line in "${outro_strings[@]}"; do
+		type_out "$line"
+		sleep "$TYPE_LINES_DELAY"
+	done
+	echo ""
+fi
+
 logger done "Installation complete"
