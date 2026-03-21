@@ -10,21 +10,22 @@ log() {
 log "Updating package list..."
 sudo apt update
 
-# apt packages
-apt_packages=(
-	"zsh"
-	"wget"
-	"curl"
-	"ca-certificates"
-	"stow"
-	"git"
-	"gh"
-	"python3"
-	"python3-pip"
+# apt packages (binary:package mapping)
+declare -A apt_packages=(
+	["zsh"]="zsh"
+	["wget"]="wget"
+	["curl"]="curl"
+	["ca-certificates"]="ca-certificates"
+	["stow"]="stow"
+	["git"]="git"
+	["gh"]="gh"
+	["python3"]="python3"
+	["pip"]="python3-pip"
 )
 
-for package in "${apt_packages[@]}"; do
-	if ! command -v "$package" &> /dev/null; then
+for binary in "${!apt_packages[@]}"; do
+	package="${apt_packages[$binary]}"
+	if ! command -v "$binary" &> /dev/null; then
 		log "Installing $package..."
 		sudo apt install -y "$package"
 	else
