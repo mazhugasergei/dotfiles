@@ -29,7 +29,7 @@ logger() {
 
 # update
 logger info "Updating package list..."
-sudo apt-get update
+sudo apt-get update -qq
 
 # apt packages (binary:package mapping)
 declare -A apt_packages=(
