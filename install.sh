@@ -194,9 +194,12 @@ else
 fi
 
 # stow
+original_dir=$(pwd)
+cd "$(dirname "$0")"
 logger info "Running stow..."
 stow zsh git
 logger done "stow completed"
+cd "$original_dir"
 
 # zsh
 if [ "$SHELL" != "$(which zsh)" ]; then
