@@ -59,21 +59,42 @@ for binary in "${!apt_packages[@]}"; do
 done
 
 # Display package status table
-logger info "Package Status:"
 echo ""
-echo "┌─────────────────────────┬───────────────────┐"
-echo "│ Package Name           │ Status            │"
-echo "├─────────────────────────┼───────────────────┤"
+
+# Find the longest package name
+max_length=0
+all_packages=("${!already_installed[@]}" "${!to_install[@]}")
+for package in "${all_packages[@]}"; do
+	if [ ${#package} -gt $max_length ]; then
+		max_length=${#package}
+	fi
+done
+
+# Ensure minimum width and add padding
+col_width=$((max_length + 2))
+if [ $col_width -lt 23 ]; then
+	col_width=23
+fi
+
+# Build table dynamically
+top_border="┌─$(printf '─%.0s' $(seq 1 $col_width))─┬───────────────────┐"
+header="│ $(printf "%-${col_width}s" "Package Name") │ Status            │"
+middle_border="├─$(printf '─%.0s' $(seq 1 $col_width))─┼───────────────────┤"
+bottom_border="└─$(printf '─%.0s' $(seq 1 $col_width))─┴───────────────────┘"
+
+echo "$top_border"
+echo "$header"
+echo "$middle_border"
 
 for package in "${!already_installed[@]}"; do
-	echo "│ $(printf "%-23s" "$package") │ ✓ Already installed │"
+	echo "│ $(printf "%-${col_width}s" "$package") │ ✓ Already installed │"
 done
 
 for package in "${!to_install[@]}"; do
-	echo "│ $(printf "%-23s" "$package") │ ○ To be installed  │"
+	echo "│ $(printf "%-${col_width}s" "$package") │ ○ To be installed  │"
 done
 
-echo "└─────────────────────────┴───────────────────┘"
+echo "$bottom_border"
 echo ""
 
 # Install missing packages
