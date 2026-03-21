@@ -48,7 +48,7 @@ for binary in "${!apt_packages[@]}"; do
 	package="${apt_packages[$binary]}"
 	if ! dpkg -l | grep -q "^ii  $package "; then
 		logger info "Installing $package..."
-		sudo apt-get install -y "$package"
+		sudo apt-get install -yqq "$package"
 	else
 		logger done "$package is already installed"
 	fi
@@ -69,7 +69,7 @@ fi
 if ! command -v node &> /dev/null; then
 	logger info "Installing node..."
 	curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-	sudo apt-get install -y nodejs
+	sudo apt-get install -yqq nodejs
 else
 	logger done "node is already installed"
 fi
