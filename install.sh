@@ -2,6 +2,18 @@
 
 set -e
 
+# Check for sudo privileges
+if ! sudo -n true 2>/dev/null; then
+	logger warn "This script requires sudo privileges to install packages."
+	logger warn "Please enter your sudo password when prompted."
+	sudo -v
+	if [ $? -ne 0 ]; then
+		logger error "Sudo authentication failed. Exiting."
+		exit 1
+	fi
+	logger done "Sudo access verified"
+fi
+
 # Logger object with dot notation methods
 logger() {
 	local method="$1"
