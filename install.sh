@@ -2,6 +2,35 @@
 
 set -e
 
+# Parse command line arguments
+SKIP_INTRO=false
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+		--skip-intro|-s)
+			SKIP_INTRO=true
+			shift
+			;;
+		-h|--help)
+			echo "Usage: $0 [OPTIONS]"
+			echo ""
+			echo "OPTIONS:"
+			echo "  -s, --skip-intro    Skip the intro typewriter effect"
+			echo "  -h, --help          Show this help message"
+			echo ""
+			echo "Examples:"
+			echo "  $0                  Run full installation with intro"
+			echo "  $0 -s               Skip intro and go straight to installation"
+			echo ""
+			exit 0
+			;;
+		*)
+			echo "Unknown option: $1"
+			echo "Usage: $0 [-s|--skip-intro] [-h|--help]"
+			exit 1
+			;;
+	esac
+done
+
 # Check for sudo privileges
 if ! sudo -n true 2>/dev/null; then
 	logger warn "This script requires sudo privileges to install packages."
@@ -25,15 +54,18 @@ type_out() {
 }
 
 # The Intro Reveal
-echo ""
-type_out "Right, let's have a look at this absolute shambles, then..."
-sleep 0.5
+if [ "$SKIP_INTRO" = false ]; then
+	echo ""
+	type_out "Right, let's have a look at this absolute shambles, then..."
+	sleep 0.5
 
-type_out "I shall be transforming this appalling OS into a world-class workstation, easy days."
-sleep 0.5
+	type_out "I shall be transforming this appalling OS into a world-class workstation, easy days."
+	sleep 0.5
 
-type_out "A cheeky little install? Don't mind if I do..."
-echo ""
+	type_out "A cheeky little install? Don't mind if I do..."
+	sleep 0.5
+	echo ""
+fi
 
 # Logger object with dot notation methods
 logger() {
