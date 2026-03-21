@@ -58,6 +58,31 @@ if ! sudo -n true 2>/dev/null; then
 	logger done "Sudo access verified"
 fi
 
+# Logger object with dot notation methods
+logger() {
+	local method="$1"
+	local message="$2"
+	
+	case "$method" in
+		"info")
+			echo -e "\033[44m INFO \033[0m $message"
+			;;
+		"done")
+			echo -e "\033[42m DONE \033[0m $message"
+			;;
+		"error")
+			echo -e "\033[41m ERROR \033[0m $message"
+			;;
+		"warn")
+			echo -e "\033[43m WARN \033[0m $message"
+			;;
+		*)
+			echo "Unknown logger method: $method"
+			return 1
+			;;
+	esac
+}
+
 # Typewriter Configuration
 TYPE_SPEED=0.05
 TYPE_LINES_DELAY=1
@@ -94,31 +119,6 @@ if [ "$FORCE_ERROR" = true ]; then
 	logger error "Good heavens! An unknown error occurred during installation"
 	INSTALLATION_ERROR=true
 else
-
-# Logger object with dot notation methods
-logger() {
-	local method="$1"
-	local message="$2"
-	
-	case "$method" in
-		"info")
-			echo -e "\033[44m INFO \033[0m $message"
-			;;
-		"done")
-			echo -e "\033[42m DONE \033[0m $message"
-			;;
-		"error")
-			echo -e "\033[41m ERROR \033[0m $message"
-			;;
-		"warn")
-			echo -e "\033[43m WARN \033[0m $message"
-			;;
-		*)
-			echo "Unknown logger method: $method"
-			return 1
-			;;
-	esac
-}
 
 # update
 logger info "Updating package list..."
