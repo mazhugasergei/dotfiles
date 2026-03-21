@@ -44,15 +44,49 @@ declare -A apt_packages=(
 	["pip"]="python3-pip"
 )
 
+# Check all packages and create installation plan
+declare -A to_install
+declare -A already_installed
+
+logger info "Checking package status..."
 for binary in "${!apt_packages[@]}"; do
 	package="${apt_packages[$binary]}"
 	if ! dpkg -l | grep -q "^ii  $package "; then
-		logger info "Installing $package..."
-		sudo apt-get install -yqq "$package"
+		to_install["$package"]="$binary"
 	else
-		logger done "$package is already installed"
+		already_installed["$package"]="$binary"
 	fi
 done
+
+# Display package status table
+logger info "Package Status:"
+echo ""
+echo "┌─────────────────────────┬───────────────────┐"
+echo "│ Package Name           │ Status            │"
+echo "├─────────────────────────┼───────────────────┤"
+
+for package in "${!already_installed[@]}"; do
+	echo "│ $(printf "%-23s" "$package") │ ✓ Already installed │"
+done
+
+for package in "${!to_install[@]}"; do
+	echo "│ $(printf "%-23s" "$package") │ ○ To be installed  │"
+done
+
+echo "└─────────────────────────┴───────────────────┘"
+echo ""
+
+# Install missing packages
+if [ ${#to_install[@]} -gt 0 ]; then
+	logger info "Installing missing packages..."
+	for package in "${!to_install[@]}"; do
+		logger info "Installing $package..."
+		sudo apt-get install -yqq "$package"
+		logger done "$package installed"
+	done
+else
+	logger done "All packages are already installed"
+fi
 
 # docker
 if ! command -v docker &> /dev/null; then
