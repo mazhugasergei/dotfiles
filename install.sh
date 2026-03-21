@@ -23,22 +23,22 @@ NC='\033[0m' # No Color
 # Typewriter Function
 # Usage: type_out "text" speed
 type_out() {
-  echo "$1" | while IFS= read -r -n1 char; do
+  echo -e "$1" | while IFS= read -r -n1 char; do
     printf "%s" "$char"
-    sleep "$2"
+    sleep 0.05
   done
   printf "\n"
 }
 
 # The Intro Reveal
 echo -e "${BOLD}------------------------------------------${NC}"
-type_out -e "${CYAN}Right, let's have a look at this absolute shambles, then...${NC}" 0.05
+type_out "${CYAN}Right, let's have a look at this absolute shambles, then...${NC}"
 sleep 0.5
 
-type_out -e "${BOLD}I shall be transforming this appalling OS into a world-class workstation, easy days.${NC}" 0.05
+type_out "${BOLD}I shall be transforming this appalling OS into a world-class workstation, easy days.${NC}"
 sleep 0.5
 
-type_out -e "${GOLD}A cheeky little install? Don't mind if I do...${NC}" 0.05
+type_out "${GOLD}A cheeky little install? Don't mind if I do...${NC}"
 echo -e "${BOLD}------------------------------------------${NC}"
 
 # Logger object with dot notation methods
