@@ -19,7 +19,7 @@ fi
 type_out() {
   echo -e "$1" | while IFS= read -r -n1 char; do
     printf "%s" "$char"
-    sleep 0.025
+    sleep 0.04
   done
   printf "\n"
 }
