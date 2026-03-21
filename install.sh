@@ -6,59 +6,79 @@ log() {
 	echo -e "\033[44m INFO \033[0m $1"
 }
 
+# update
 log "Updating package list..."
 sudo apt update
 
-log "Installing zsh..."
-sudo apt install -y zsh
+# apt packages
+apt_packages=(
+	"zsh"
+	"wget"
+	"curl"
+	"ca-certificates"
+	"stow"
+	"git"
+	"gh"
+	"python3"
+	"python3-pip"
+)
 
-log "Installing necessary packages..."
-sudo apt install -y wget curl ca-certificates
+for package in "${apt_packages[@]}"; do
+	if ! command -v "$package" &> /dev/null; then
+		log "Installing $package..."
+		sudo apt install -y "$package"
+	else
+		log "$package is already installed"
+	fi
+done
 
-log "Installing stow..."
-if ! command -v stow &> /dev/null; then
-	sudo apt install -y stow
-fi
-
-log "Installing git..."
-if ! command -v git &> /dev/null; then
-	sudo apt install -y git
-fi
-
-log "Installing docker..."
+# docker
 if ! command -v docker &> /dev/null; then
+	log "Installing docker..."
 	curl -fsSL https://get.docker.com -o get-docker.sh
 	sh get-docker.sh
 	sudo usermod -aG docker $USER
 	rm get-docker.sh
+else
+	log "docker is already installed"
 fi
 
-log "Installing node..."
+# node
 if ! command -v node &> /dev/null; then
+	log "Installing node..."
 	curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 	sudo apt install -y nodejs
+else
+	log "node is already installed"
 fi
 
-log "Installing python..."
-if ! command -v python3 &> /dev/null; then
-	sudo apt install -y python3 python3-pip
-fi
-
-log "Installing uv..."
+# uv
 if ! command -v uv &> /dev/null; then
+	log "Installing uv..."
 	curl -LsSf https://astral.sh/uv/install.sh | sh
+else
+	log "uv is already installed"
 fi
 
-log "Installing AdGuard VPN CLI..."
-curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v
+# adguardvpn-cli
+if ! command -v adguardvpn-cli &> /dev/null; then
+	log "Installing AdGuard VPN CLI..."
+	curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v
+else
+	log "AdGuard VPN CLI is already installed"
+fi
 
+# stow
 log "Running stow..."
 stow zsh git
 
+# zsh
 log "Setting zsh as default shell..."
 sudo chsh -s $(which zsh) $USER
 
+# bash
 log "Removing bash files..."
 rm -f ~/.bashrc ~/.bash_profile ~/.profile ~/.bash_logout ~/.bash_history
 
+# complete
 log "Installation complete"
