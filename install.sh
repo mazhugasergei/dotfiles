@@ -12,6 +12,10 @@ while [[ $# -gt 0 ]]; do
 			SKIP_INTRO=true
 			shift
 			;;
+		--skip-intro)
+			SKIP_INTRO=true
+			shift
+			;;
 		--errored)
 			FORCE_ERROR=true
 			shift
@@ -21,19 +25,21 @@ while [[ $# -gt 0 ]]; do
 			echo ""
 			echo "OPTIONS:"
 			echo "  -s, --skip         Skip the intro and outro typewriter effects"
+			echo "      --skip-intro   Skip only the intro typewriter effects"
 			echo "      --errored      Force error condition for testing error outro"
 			echo "  -h, --help         Show this help message"
 			echo ""
 			echo "Examples:"
 			echo "  $0                   Run full installation with effects"
 			echo "  $0 -s                Skip effects and go straight to installation"
+			echo "  $0 --skip-intro      Skip intro but keep outro"
 			echo "  $0 --errored         Test errored behaviour"
 			echo ""
 			exit 0
 			;;
 		*)
 			echo "Unknown option: $1"
-			echo "Usage: $0 [-s|--skip] [--errored] [-h|--help]"
+			echo "Usage: $0 [-s|--skip] [--skip-intro] [--errored] [-h|--help]"
 			exit 1
 			;;
 	esac
