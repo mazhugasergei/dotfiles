@@ -46,7 +46,7 @@ declare -A apt_packages=(
 
 for binary in "${!apt_packages[@]}"; do
 	package="${apt_packages[$binary]}"
-	if ! command -v "$binary" &> /dev/null; then
+	if ! apt list --installed | grep -q "^$package/"; then
 		logger log "Installing $package..."
 		sudo apt install -y "$package"
 	else
