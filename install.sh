@@ -324,6 +324,8 @@ else
 	logger done "no bash files found to remove"
 fi
 
+fi # Close the FORCE_ERROR else block
+
 # complete
 if [ "$SKIP" = false ]; then
 	# The Outro
@@ -350,5 +352,3 @@ if [ "$SKIP" = false ]; then
 	done
 	echo ""
 fi
-
-fi # Close the FORCE_ERROR else block
