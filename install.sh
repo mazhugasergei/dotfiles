@@ -36,14 +36,14 @@ border_line=$(printf '+-%.0s+' $(seq 1 $border_width))
 empty_line=$(printf "| %.0s|" $(seq 1 $((border_width - 2))))
 
 echo ""
-echo -e "\033[36m$border_line\033[0m"
-echo -e "\033[36m|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|\033[0m"
-echo -e "\033[36m|$(printf "%*s" $(((border_width - ${#intro_title}) / 2)) | tr ' ' ' ') \033[1;37m$intro_title\033[0;36m $(printf "%*s" $(((border_width - ${#intro_title}) / 2)) | tr ' ' ' ')|\033[0m"
-echo -e "\033[36m|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|\033[0m"
-echo -e "\033[36m|$(printf "%*s" $(((border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ') \033[33m$intro_desc1\033[0;36m $(printf "%*s" $(((border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ')|\033[0m"
-echo -e "\033[36m|$(printf "%*s" $(((border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ') \033[32m$intro_desc2\033[0;36m $(printf "%*s" $(((border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ')|\033[0m"
-echo -e "\033[36m|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|\033[0m"
-echo -e "\033[36m$border_line\033[0m"
+echo "$border_line"
+echo "|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|"
+echo "|$(printf "%*s" $(((border_width - ${#intro_title}) / 2)) | tr ' ' ' ') $intro_title $(printf "%*s" $(((border_width - ${#intro_title}) / 2)) | tr ' ' ' ')|"
+echo "|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|"
+echo "|$(printf "%*s" $(((border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ') $intro_desc1 $(printf "%*s" $(((border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ')|"
+echo "|$(printf "%*s" $(((border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ') $intro_desc2 $(printf "%*s" $(((border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ')|"
+echo "|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|"
+echo "$border_line"
 echo ""
 logger info "Initializing your awesome new system..."
 sleep 1
