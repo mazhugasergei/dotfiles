@@ -105,9 +105,21 @@ else
 fi
 
 # bash
-logger info "Removing bash files..."
-rm -f ~/.bashrc ~/.bash_profile ~/.profile ~/.bash_logout ~/.bash_history
-logger done "bash files removed"
+bash_files=("$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile" "$HOME/.bash_logout" "$HOME/.bash_history")
+files_removed=false
+
+for file in "${bash_files[@]}"; do
+	if [ -f "$file" ]; then
+		rm -f "$file"
+		files_removed=true
+	fi
+done
+
+if [ "$files_removed" = true ]; then
+	logger done "bash files removed"
+else
+	logger done "no bash files found to remove"
+fi
 
 # complete
 logger done "Installation complete"
