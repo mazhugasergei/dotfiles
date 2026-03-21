@@ -31,17 +31,17 @@ logger() {
 logger info "Updating package list..."
 sudo apt-get update -qq
 
-# apt packages (binary:package mapping)
-declare -A apt_packages=(
-	["zsh"]="zsh"
-	["wget"]="wget"
-	["curl"]="curl"
-	["ca-certificates"]="ca-certificates"
-	["stow"]="stow"
-	["git"]="git"
-	["gh"]="gh"
-	["python3"]="python3"
-	["pip"]="python3-pip"
+# apt packages
+apt_packages=(
+	"zsh"
+	"wget"
+	"curl"
+	"ca-certificates"
+	"stow"
+	"git"
+	"gh"
+	"python3"
+	"python3-pip"
 )
 
 # Check all packages and create installation plan
@@ -49,12 +49,11 @@ declare -A to_install
 declare -A already_installed
 
 logger info "Checking package status..."
-for binary in "${!apt_packages[@]}"; do
-	package="${apt_packages[$binary]}"
+for package in "${apt_packages[@]}"; do
 	if ! dpkg -l | grep -q "^ii  $package "; then
-		to_install["$package"]="$binary"
+		to_install["$package"]="$package"
 	else
-		already_installed["$package"]="$binary"
+		already_installed["$package"]="$package"
 	fi
 done
 
