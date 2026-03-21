@@ -8,7 +8,7 @@ logger() {
 	local message="$2"
 	
 	case "$method" in
-		"log")
+		"info")
 			echo -e "\033[44m INFO \033[0m $message"
 			;;
 		"done")
@@ -28,7 +28,7 @@ logger() {
 }
 
 # update
-logger log "Updating package list..."
+logger info "Updating package list..."
 sudo apt update
 
 # apt packages (binary:package mapping)
@@ -47,7 +47,7 @@ declare -A apt_packages=(
 for binary in "${!apt_packages[@]}"; do
 	package="${apt_packages[$binary]}"
 	if ! apt list --installed | grep -q "^$package/"; then
-		logger log "Installing $package..."
+		logger info "Installing $package..."
 		sudo apt install -y "$package"
 	else
 		logger done "$package is already installed"
@@ -56,7 +56,7 @@ done
 
 # docker
 if ! command -v docker &> /dev/null; then
-	logger log "Installing docker..."
+	logger info "Installing docker..."
 	curl -fsSL https://get.docker.com -o get-docker.sh
 	sh get-docker.sh
 	sudo usermod -aG docker $USER
@@ -67,7 +67,7 @@ fi
 
 # node
 if ! command -v node &> /dev/null; then
-	logger log "Installing node..."
+	logger info "Installing node..."
 	curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 	sudo apt install -y nodejs
 else
@@ -76,7 +76,7 @@ fi
 
 # uv
 # if ! command -v uv &> /dev/null; then
-# 	logger log "Installing uv..."
+# 	logger info "Installing uv..."
 # 	curl -LsSf https://astral.sh/uv/install.sh | sh
 # else
 # 	logger done "uv is already installed"
@@ -84,24 +84,24 @@ fi
 
 # adguardvpn-cli
 if ! command -v adguardvpn-cli &> /dev/null; then
-	logger log "Installing AdGuard VPN CLI..."
+	logger info "Installing AdGuard VPN CLI..."
 	curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v
 else
 	logger done "AdGuard VPN CLI is already installed"
 fi
 
 # stow
-log "Running stow..."
+logger info "Running stow..."
 stow zsh git
 logger done "stow completed"
 
 # zsh
-logger log "Setting zsh as default shell..."
+logger info "Setting zsh as default shell..."
 sudo chsh -s $(which zsh) $USER
 logger done "zsh set as default shell"
 
 # bash
-logger log "Removing bash files..."
+logger info "Removing bash files..."
 rm -f ~/.bashrc ~/.bash_profile ~/.profile ~/.bash_logout ~/.bash_history
 logger done "bash files removed"
 
