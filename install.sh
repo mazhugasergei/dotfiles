@@ -75,12 +75,12 @@ else
 fi
 
 # uv
-if ! command -v uv &> /dev/null; then
-	logger log "Installing uv..."
-	curl -LsSf https://astral.sh/uv/install.sh | sh
-else
-	logger done "uv is already installed"
-fi
+# if ! command -v uv &> /dev/null; then
+# 	logger log "Installing uv..."
+# 	curl -LsSf https://astral.sh/uv/install.sh | sh
+# else
+# 	logger done "uv is already installed"
+# fi
 
 # adguardvpn-cli
 if ! command -v adguardvpn-cli &> /dev/null; then
