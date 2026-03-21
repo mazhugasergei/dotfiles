@@ -330,5 +330,3 @@ if [ "$SKIP_INTRO" = false ]; then
 	done
 	echo ""
 fi
-
-logger done "Installation complete"
