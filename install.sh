@@ -15,16 +15,37 @@ if ! sudo -n true 2>/dev/null; then
 fi
 
 # Nice looking intro
+intro_title="🎉 WELCOME TO YOUR NEW SYSTEM SETUP! 🎉"
+intro_desc1="✨ Let's transform this fresh OS into your perfect dev machine! ✨"
+intro_desc2="🚀 Installing all the tools you need to start creating! 🚀"
+
+# Calculate maximum length for dynamic border
+max_intro_length=${#intro_title}
+if [ ${#intro_desc1} -gt $max_intro_length ]; then
+	max_intro_length=${#intro_desc1}
+fi
+if [ ${#intro_desc2} -gt $max_intro_length ]; then
+	max_intro_length=${#intro_desc2}
+fi
+
+# Add padding
+border_width=$((max_intro_length + 4))
+
+# Create dynamic border
+border_line=$(printf '+-%.0s+' $(seq 1 $border_width))
+empty_line=$(printf "| %.0s|" $(seq 1 $((border_width - 2))))
+
 echo ""
-echo -e "\033[36m╔══════════════════════════════════════════════════════════════╗\033[0m"
-echo -e "\033[36m║                                                              ║\033[0m"
-echo -e "\033[36m║                    \033[1;37m🚀 SYSTEM SETUP STARTING 🚀\033[0;36m                    ║\033[0m"
-echo -e "\033[36m║                                                              ║\033[0m"
-echo -e "\033[36m║  \033[33m✨\033[36m Setting up your development environment with essential tools   \033[33m✨\033[36m  ║\033[0m"
-echo -e "\033[36m║                                                              ║\033[0m"
-echo -e "\033[36m╚══════════════════════════════════════════════════════════════╝\033[0m"
+echo -e "\033[36m$border_line\033[0m"
+echo -e "\033[36m|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|\033[0m"
+echo -e "\033[36m|$(printf "%*s" $(((border_width - ${#intro_title}) / 2)) | tr ' ' ' ') \033[1;37m$intro_title\033[0;36m $(printf "%*s" $(((border_width - ${#intro_title}) / 2)) | tr ' ' ' ')|\033[0m"
+echo -e "\033[36m|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|\033[0m"
+echo -e "\033[36m|$(printf "%*s" $(((border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ') \033[33m$intro_desc1\033[0;36m $(printf "%*s" $(((border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ')|\033[0m"
+echo -e "\033[36m|$(printf "%*s" $(((border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ') \033[32m$intro_desc2\033[0;36m $(printf "%*s" $(((border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ')|\033[0m"
+echo -e "\033[36m|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|\033[0m"
+echo -e "\033[36m$border_line\033[0m"
 echo ""
-logger info "Initializing system setup..."
+logger info "Initializing your awesome new system..."
 sleep 1
 
 # Logger object with dot notation methods
