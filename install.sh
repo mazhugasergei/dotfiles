@@ -62,36 +62,49 @@ done
 echo ""
 
 # Find the longest package name
-max_length=0
+max_pkg_length=0
 all_packages=("${!already_installed[@]}" "${!to_install[@]}")
 for package in "${all_packages[@]}"; do
-	if [ ${#package} -gt $max_length ]; then
-		max_length=${#package}
+	if [ ${#package} -gt $max_pkg_length ]; then
+		max_pkg_length=${#package}
 	fi
 done
 
-# Ensure minimum width and add padding
-col_width=$((max_length + 2))
-if [ $col_width -lt 23 ]; then
-	col_width=23
+# Find the longest status string
+status_strings=("Already installed" "To be installed")
+max_status_length=0
+for status in "${status_strings[@]}"; do
+	if [ ${#status} -gt $max_status_length ]; then
+		max_status_length=${#status}
+	fi
+done
+
+# Ensure minimum widths and add padding
+pkg_col_width=$((max_pkg_length + 2))
+status_col_width=$((max_status_length + 2))
+if [ $pkg_col_width -lt 23 ]; then
+	pkg_col_width=23
+fi
+if [ $status_col_width -lt 17 ]; then
+	status_col_width=17
 fi
 
 # Build table dynamically
-top_border="┌─$(printf '─%.0s' $(seq 1 $col_width))─┬───────────────────┐"
-header="│ $(printf "%-${col_width}s" "Package Name") │ Status            │"
-middle_border="├─$(printf '─%.0s' $(seq 1 $col_width))─┼───────────────────┤"
-bottom_border="└─$(printf '─%.0s' $(seq 1 $col_width))─┴───────────────────┘"
+top_border="┌─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┬─$(printf '─%.0s' $(seq 1 $status_col_width))─┐"
+header="│ $(printf "%-${pkg_col_width}s" "Package Name") │ $(printf "%-${status_col_width}s" "Status") │"
+middle_border="├─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┼─$(printf '─%.0s' $(seq 1 $status_col_width))─┤"
+bottom_border="└─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┴─$(printf '─%.0s' $(seq 1 $status_col_width))─┘"
 
 echo "$top_border"
 echo "$header"
 echo "$middle_border"
 
 for package in "${!already_installed[@]}"; do
-	echo "│ $(printf "%-${col_width}s" "$package") │ ✓ Already installed │"
+	echo "│ $(printf "%-${pkg_col_width}s" "$package") │ ✓ Already installed │"
 done
 
 for package in "${!to_install[@]}"; do
-	echo "│ $(printf "%-${col_width}s" "$package") │ ○ To be installed  │"
+	echo "│ $(printf "%-${pkg_col_width}s" "$package") │ ○ To be installed  │"
 done
 
 echo "$bottom_border"
