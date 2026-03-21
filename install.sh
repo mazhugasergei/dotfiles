@@ -14,6 +14,19 @@ if ! sudo -n true 2>/dev/null; then
 	logger done "Sudo access verified"
 fi
 
+# Nice looking intro
+echo ""
+echo -e "\033[36m╔══════════════════════════════════════════════════════════════╗\033[0m"
+echo -e "\033[36m║                                                              ║\033[0m"
+echo -e "\033[36m║                    \033[1;37m🚀 SYSTEM SETUP STARTING 🚀\033[0;36m                    ║\033[0m"
+echo -e "\033[36m║                                                              ║\033[0m"
+echo -e "\033[36m║  \033[33m✨\033[36m Setting up your development environment with essential tools   \033[33m✨\033[36m  ║\033[0m"
+echo -e "\033[36m║                                                              ║\033[0m"
+echo -e "\033[36m╚══════════════════════════════════════════════════════════════╝\033[0m"
+echo ""
+logger info "Initializing system setup..."
+sleep 1
+
 # Logger object with dot notation methods
 logger() {
 	local method="$1"
