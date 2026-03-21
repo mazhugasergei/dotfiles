@@ -78,14 +78,19 @@ for status in "${status_strings[@]}"; do
 	fi
 done
 
+# Configuration for table formatting
+min_pkg_col_width=23
+min_status_col_width=17
+col_padding=2
+
 # Ensure minimum widths and add padding
-pkg_col_width=$((max_pkg_length + 2))
-status_col_width=$((max_status_length + 2))
-if [ $pkg_col_width -lt 23 ]; then
-	pkg_col_width=23
+pkg_col_width=$((max_pkg_length + col_padding))
+status_col_width=$((max_status_length + col_padding))
+if [ $pkg_col_width -lt $min_pkg_col_width ]; then
+	pkg_col_width=$min_pkg_col_width
 fi
-if [ $status_col_width -lt 17 ]; then
-	status_col_width=17
+if [ $status_col_width -lt $min_status_col_width ]; then
+	status_col_width=$min_status_col_width
 fi
 
 # Build table dynamically
