@@ -48,22 +48,23 @@ fi
 type_out() {
   echo -e "$1" | while IFS= read -r -n1 char; do
     printf "%s" "$char"
-    sleep 0.04
+    sleep 0.05
   done
   printf "\n"
 }
 
 # The Intro Reveal
 if [ "$SKIP_INTRO" = false ]; then
-	echo ""
-	type_out "Right, let's have a look at this absolute shambles, then..."
-	sleep 0.5
-
-	type_out "I shall be transforming this appalling OS into a world-class workstation, easy days."
-	sleep 0.5
-
-	type_out "A cheeky little install? Don't mind if I do..."
-	sleep 0.5
+	intro_strings=(
+		"> Right, let's have a look at this absolute shambles, then..."
+		"> I shall be transforming this appalling OS into a world-class workstation, easy days."
+		"> A cheeky little install? Don't mind if I do..."
+	)
+	
+	for line in "${intro_strings[@]}"; do
+		type_out "$line" 0.04
+		sleep 0.1
+	done
 	echo ""
 fi
 
