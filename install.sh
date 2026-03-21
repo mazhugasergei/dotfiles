@@ -2,6 +2,26 @@
 
 set -e
 
+# Print help message
+print_help() {
+	echo "Usage: $0 [OPTIONS]"
+	echo ""
+	echo "OPTIONS:"
+	echo "  -s, --skip         Skip the intro and outro typewriter effects"
+	echo "      --skip-intro   Skip only the intro typewriter effects"
+	echo "  -e, --errored      Force error condition for testing error outro"
+	echo "  -h, --help         Show this help message"
+	echo ""
+	echo "Examples:"
+	echo "  $0                   Run full installation with effects"
+	echo "  $0 -s                Skip effects and go straight to installation"
+	echo "  $0 --skip-intro      Skip intro but keep outro"
+	echo "  $0 --errored         Test errored behaviour"
+	echo "  $0 -e                Test errored behaviour (shorthand)"
+	echo "  $0 -se               Skip effects and test errored behaviour"
+	echo ""
+}
+
 # Parse command line arguments
 SKIP=false
 SKIP_INTRO=false
@@ -17,27 +37,38 @@ while [[ $# -gt 0 ]]; do
 			SKIP_INTRO=true
 			shift
 			;;
-		--errored|-e)
+		-e|--errored)
 			FORCE_ERROR=true
 			shift
 			;;
 		-h|--help)
-			echo "Usage: $0 [OPTIONS]"
-			echo ""
-			echo "OPTIONS:"
-			echo "  -s, --skip         Skip the intro and outro typewriter effects"
-			echo "      --skip-intro   Skip only the intro typewriter effects"
-			echo "  -e, --errored      Force error condition for testing error outro"
-			echo "  -h, --help         Show this help message"
-			echo ""
-			echo "Examples:"
-			echo "  $0                   Run full installation with effects"
-			echo "  $0 -s                Skip effects and go straight to installation"
-			echo "  $0 --skip-intro      Skip intro but keep outro"
-			echo "  $0 --errored         Test errored behaviour"
-			echo "  $0 -e                Test errored behaviour (shorthand)"
-			echo ""
+			print_help
 			exit 0
+			;;
+		-*)
+			# Handle combined short flags
+			flags=$(echo "$1" | sed 's/^-//')
+			for (( i=0; i<${#flags}; i++ )); do
+				flag="${flags:$i:1}"
+				case "$flag" in
+					s)
+						SKIP=true
+						;;
+					e)
+						FORCE_ERROR=true
+						;;
+					h)
+						print_help
+						exit 0
+						;;
+					*)
+						echo "Unknown option: -$flag"
+						echo "Usage: $0 [-s|--skip] [--skip-intro] [-e|--errored] [-h|--help]"
+						exit 1
+						;;
+				esac
+			done
+			shift
 			;;
 		*)
 			echo "Unknown option: $1"
