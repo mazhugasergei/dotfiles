@@ -31,15 +31,15 @@ type_out() {
 }
 
 # The Intro Reveal
-echo "${BOLD}------------------------------------------${NC}"
-type_out "${CYAN}Right, let’s have a look at this absolute shambles, then...${NC}" 0.05
+echo -e "${BOLD}------------------------------------------${NC}"
+type_out -e "${CYAN}Right, let's have a look at this absolute shambles, then...${NC}" 0.05
 sleep 0.5
 
-type_out "${BOLD}I shall be transforming this appalling OS into a world-class workstation, easy days.${NC}" 0.03
+type_out -e "${BOLD}I shall be transforming this appalling OS into a world-class workstation, easy days.${NC}" 0.05
 sleep 0.5
 
-type_out "${GOLD}A cheeky little install? Don't mind if I do...${NC}" 0.08
-echo "${BOLD}------------------------------------------${NC}"
+type_out -e "${GOLD}A cheeky little install? Don't mind if I do...${NC}" 0.05
+echo -e "${BOLD}------------------------------------------${NC}"
 
 # Logger object with dot notation methods
 logger() {
