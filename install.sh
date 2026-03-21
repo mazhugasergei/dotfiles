@@ -6,11 +6,14 @@ log() {
 	echo -e "\033[44m INFO \033[0m $1"
 }
 
-log "Installing zsh..."
-sudo apt update && sudo apt install -y zsh
+log "Updating package list..."
+sudo apt update
 
-log "Setting zsh as default shell..."
-sudo chsh -s $(which zsh) $USER
+log "Installing zsh..."
+sudo apt install -y zsh
+
+log "Installing necessary packages..."
+sudo apt install -y wget curl ca-certificates
 
 log "Installing stow..."
 if ! command -v stow &> /dev/null; then
@@ -47,14 +50,15 @@ if ! command -v uv &> /dev/null; then
 fi
 
 log "Installing AdGuard VPN CLI..."
-sudo apt update
-sudo apt install -y curl
 curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v
 
 log "Running stow..."
 stow zsh git
 
-log "Installation complete"
+log "Setting zsh as default shell..."
+sudo chsh -s $(which zsh) $USER
 
 log "Removing bash files..."
 rm -f ~/.bashrc ~/.bash_profile ~/.profile ~/.bash_logout ~/.bash_history
+
+log "Installation complete"
