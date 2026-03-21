@@ -96,43 +96,43 @@ for status in "${status_strings[@]}"; do
 done
 
 # Configuration for table formatting
-min_pkg_col_width=23
-min_status_col_width=17
-min_method_col_width=8
-col_padding=2
+table_pkg_col_min_width=23
+table_status_col_min_width=17
+table_method_col_min_width=8
+table_col_padding=2
 
 # Ensure minimum widths and add padding
-pkg_col_width=$((max_pkg_length + col_padding))
-status_col_width=$((max_status_length + col_padding))
-method_col_width=$((min_method_col_width + col_padding))
-if [ $pkg_col_width -lt $min_pkg_col_width ]; then
-	pkg_col_width=$min_pkg_col_width
+table_pkg_col_width=$((max_pkg_length + table_col_padding))
+table_status_col_width=$((max_status_length + table_col_padding))
+table_method_col_width=$((table_method_col_min_width + table_col_padding))
+if [ $table_pkg_col_width -lt $table_pkg_col_min_width ]; then
+	table_pkg_col_width=$table_pkg_col_min_width
 fi
-if [ $status_col_width -lt $min_status_col_width ]; then
-	status_col_width=$min_status_col_width
+if [ $table_status_col_width -lt $table_status_col_min_width ]; then
+	table_status_col_width=$table_status_col_min_width
 fi
 
 # Build table dynamically
-top_border="┌─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┬─$(printf '─%.0s' $(seq 1 $status_col_width))─┬─$(printf '─%.0s' $(seq 1 $method_col_width))─┐"
-header="│ $(printf "%-${pkg_col_width}s" "Package Name") │ $(printf "%-${status_col_width}s" "Status") │ $(printf "%-${method_col_width}s" "Method") │"
-middle_border="├─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┼─$(printf '─%.0s' $(seq 1 $status_col_width))─┼─$(printf '─%.0s' $(seq 1 $method_col_width))─┤"
-bottom_border="└─$(printf '─%.0s' $(seq 1 $pkg_col_width))─┴─$(printf '─%.0s' $(seq 1 $status_col_width))─┴─$(printf '─%.0s' $(seq 1 $method_col_width))─┘"
+table_top_border="┌─$(printf '─%.0s' $(seq 1 $table_pkg_col_width))─┬─$(printf '─%.0s' $(seq 1 $table_method_col_width))─┬─$(printf '─%.0s' $(seq 1 $table_status_col_width))─┐"
+table_header="│ $(printf "%-${table_pkg_col_width}s" "Package Name") │ $(printf "%-${table_method_col_width}s" "Method") │ $(printf "%-${table_status_col_width}s" "Status") │"
+table_middle_border="├─$(printf '─%.0s' $(seq 1 $table_pkg_col_width))─┼─$(printf '─%.0s' $(seq 1 $table_method_col_width))─┼─$(printf '─%.0s' $(seq 1 $table_status_col_width))─┤"
+table_bottom_border="└─$(printf '─%.0s' $(seq 1 $table_pkg_col_width))─┴─$(printf '─%.0s' $(seq 1 $table_method_col_width))─┴─$(printf '─%.0s' $(seq 1 $table_status_col_width))─┘"
 
-echo "$top_border"
-echo "$header"
-echo "$middle_border"
+echo "$table_top_border"
+echo "$table_header"
+echo "$table_middle_border"
 
 for package in "${!already_installed[@]}"; do
 	method="${already_installed[$package]}"
-	echo -e "│ $(printf "%-${pkg_col_width}s" "$package") │ \033[32m✓ Already installed\033[0m │ $(printf "%-${method_col_width}s" "$method") │"
+	echo -e "│ $(printf "%-${table_pkg_col_width}s" "$package") │ $(printf "%-${table_method_col_width}s" "$method") │ \033[32m✓ Already installed\033[0m │"
 done
 
 for package in "${!to_install[@]}"; do
 	method="${to_install[$package]}"
-	echo "│ $(printf "%-${pkg_col_width}s" "$package") │ ○ To be installed  │ $(printf "%-${method_col_width}s" "$method") │"
+	echo "│ $(printf "%-${table_pkg_col_width}s" "$package") │ $(printf "%-${table_method_col_width}s" "$method") │ ○ To be installed  │"
 done
 
-echo "$bottom_border"
+echo "$table_bottom_border"
 echo ""
 
 # Install missing packages
