@@ -62,6 +62,7 @@ if [ "$SKIP_INTRO" = false ]; then
 	)
 	
 	echo ""
+	sleep 1
 	for line in "${intro_strings[@]}"; do
 		type_out "$line" 0.04
 		sleep 1
