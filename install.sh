@@ -3,13 +3,14 @@
 set -e
 
 # Parse command line arguments
+SKIP=false
 SKIP_INTRO=false
 INSTALLATION_ERROR=false
 FORCE_ERROR=false
 while [[ $# -gt 0 ]]; do
 	case "$1" in
 		-s|--skip)
-			SKIP_INTRO=true
+			SKIP=true
 			shift
 			;;
 		--skip-intro)
@@ -72,7 +73,7 @@ type_out() {
 }
 
 # The Intro Reveal
-if [ "$SKIP_INTRO" = false ]; then
+if [ "$SKIP_INTRO" = false ] && [ "$SKIP" = false ]; then
 	intro_strings=(
 		"> Right, let's have a look at this absolute shambles, then..."
 		"> I shall be transforming this appalling OS into a world-class workstation, easy days."
@@ -324,7 +325,7 @@ else
 fi
 
 # complete
-if [ "$SKIP_INTRO" = false ]; then
+if [ "$SKIP" = false ]; then
 	# The Outro
 	if [ "$INSTALLATION_ERROR" = true ]; then
 		outro_strings=(
