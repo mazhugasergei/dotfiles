@@ -2,12 +2,33 @@
 
 set -e
 
-log() {
-	echo -e "\033[44m INFO \033[0m $1"
+# Logger object with dot notation methods
+logger() {
+	local method="$1"
+	local message="$2"
+	
+	case "$method" in
+		"log")
+			echo -e "\033[44m INFO \033[0m $message"
+			;;
+		"done")
+			echo -e "\033[42m DONE \033[0m $message"
+			;;
+		"error")
+			echo -e "\033[41m ERROR \033[0m $message"
+			;;
+		"warn")
+			echo -e "\033[43m WARN \033[0m $message"
+			;;
+		*)
+			echo "Unknown logger method: $method"
+			return 1
+			;;
+	esac
 }
 
 # update
-log "Updating package list..."
+logger log "Updating package list..."
 sudo apt update
 
 # apt packages (binary:package mapping)
@@ -26,60 +47,63 @@ declare -A apt_packages=(
 for binary in "${!apt_packages[@]}"; do
 	package="${apt_packages[$binary]}"
 	if ! command -v "$binary" &> /dev/null; then
-		log "Installing $package..."
+		logger log "Installing $package..."
 		sudo apt install -y "$package"
 	else
-		log "$package is already installed"
+		logger done "$package is already installed"
 	fi
 done
 
 # docker
 if ! command -v docker &> /dev/null; then
-	log "Installing docker..."
+	logger log "Installing docker..."
 	curl -fsSL https://get.docker.com -o get-docker.sh
 	sh get-docker.sh
 	sudo usermod -aG docker $USER
 	rm get-docker.sh
 else
-	log "docker is already installed"
+	logger done "docker is already installed"
 fi
 
 # node
 if ! command -v node &> /dev/null; then
-	log "Installing node..."
+	logger log "Installing node..."
 	curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 	sudo apt install -y nodejs
 else
-	log "node is already installed"
+	logger done "node is already installed"
 fi
 
 # uv
 if ! command -v uv &> /dev/null; then
-	log "Installing uv..."
+	logger log "Installing uv..."
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 else
-	log "uv is already installed"
+	logger done "uv is already installed"
 fi
 
 # adguardvpn-cli
 if ! command -v adguardvpn-cli &> /dev/null; then
-	log "Installing AdGuard VPN CLI..."
+	logger log "Installing AdGuard VPN CLI..."
 	curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v
 else
-	log "AdGuard VPN CLI is already installed"
+	logger done "AdGuard VPN CLI is already installed"
 fi
 
 # stow
 log "Running stow..."
 stow zsh git
+logger done "stow completed"
 
 # zsh
-log "Setting zsh as default shell..."
+logger log "Setting zsh as default shell..."
 sudo chsh -s $(which zsh) $USER
+logger done "zsh set as default shell"
 
 # bash
-log "Removing bash files..."
+logger log "Removing bash files..."
 rm -f ~/.bashrc ~/.bash_profile ~/.profile ~/.bash_logout ~/.bash_history
+logger done "bash files removed"
 
 # complete
-log "Installation complete"
+logger done "Installation complete"
