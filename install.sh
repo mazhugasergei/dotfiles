@@ -16,8 +16,8 @@ fi
 
 # Nice looking intro
 intro_lines=(
-	"Right, let's have a look at this absolute shambles, then.",
-	"I shall be transforming this appalling OS into a world-class workstation, easy days.",
+	"Right, let's have a look at this absolute shambles, then."
+	"I shall be transforming this appalling OS into a world-class workstation, easy days."
 	"A cheeky little install? Don't mind if I do..."
 )
 
