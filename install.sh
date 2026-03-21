@@ -61,9 +61,10 @@ if [ "$SKIP_INTRO" = false ]; then
 		"> A cheeky little install? Don't mind if I do..."
 	)
 	
+	echo ""
 	for line in "${intro_strings[@]}"; do
 		type_out "$line" 0.04
-		sleep 0.1
+		sleep 1
 	done
 	echo ""
 fi
