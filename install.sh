@@ -29,7 +29,7 @@ logger() {
 
 # update
 logger info "Updating package list..."
-sudo apt update
+sudo apt-get update
 
 # apt packages (binary:package mapping)
 declare -A apt_packages=(
@@ -46,9 +46,9 @@ declare -A apt_packages=(
 
 for binary in "${!apt_packages[@]}"; do
 	package="${apt_packages[$binary]}"
-	if ! apt list --installed | grep -q "^$package/"; then
+	if ! dpkg -l | grep -q "^ii  $package "; then
 		logger info "Installing $package..."
-		sudo apt install -y "$package"
+		sudo apt-get install -y "$package"
 	else
 		logger done "$package is already installed"
 	fi
@@ -69,7 +69,7 @@ fi
 if ! command -v node &> /dev/null; then
 	logger info "Installing node..."
 	curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-	sudo apt install -y nodejs
+	sudo apt-get install -y nodejs
 else
 	logger done "node is already installed"
 fi
