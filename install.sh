@@ -66,7 +66,7 @@ if [ "$SKIP_INTRO" = false ]; then
 	)
 	
 	echo ""
-	sleep 1
+	sleep "$TYPE_LINES_DELAY"
 	for line in "${intro_strings[@]}"; do
 		type_out "$line"
 		sleep "$TYPE_LINES_DELAY"
@@ -297,6 +297,7 @@ if [ "$SKIP_INTRO" = false ]; then
 	)
 	
 	echo ""
+	sleep "$TYPE_LINES_DELAY"
 	for line in "${outro_strings[@]}"; do
 		type_out "$line"
 		sleep "$TYPE_LINES_DELAY"
