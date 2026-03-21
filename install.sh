@@ -20,30 +20,30 @@ intro_desc1="✨ Let's transform this fresh OS into your perfect dev machine! �
 intro_desc2="🚀 Installing all the tools you need to start creating! 🚀"
 
 # Calculate maximum length for dynamic border
-max_intro_length=${#intro_title}
-if [ ${#intro_desc1} -gt $max_intro_length ]; then
-	max_intro_length=${#intro_desc1}
+intro_max_length=${#intro_title}
+if [ ${#intro_desc1} -gt $intro_max_length ]; then
+	intro_max_length=${#intro_desc1}
 fi
-if [ ${#intro_desc2} -gt $max_intro_length ]; then
-	max_intro_length=${#intro_desc2}
+if [ ${#intro_desc2} -gt $intro_max_length ]; then
+	intro_max_length=${#intro_desc2}
 fi
 
-# Add padding
-border_width=$((max_intro_length + 4))
+# Add padding (2 spaces on each side)
+intro_border_width=$((intro_max_length + 4))
 
 # Create dynamic border
-border_line=$(printf '+-%.0s+' $(seq 1 $border_width))
-empty_line=$(printf "| %.0s|" $(seq 1 $((border_width - 2))))
+intro_border_line="+$(printf '%.0s' $(seq 1 $((intro_border_width - 2))) | tr ' ' '-')+"
+intro_empty_line=$(printf "| %.0s|" $(seq 1 $((intro_border_width - 2))))
 
 echo ""
-echo "$border_line"
-echo "|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|"
-echo "|$(printf "%*s" $(((border_width - ${#intro_title}) / 2)) | tr ' ' ' ') $intro_title $(printf "%*s" $(((border_width - ${#intro_title}) / 2)) | tr ' ' ' ')|"
-echo "|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|"
-echo "|$(printf "%*s" $(((border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ') $intro_desc1 $(printf "%*s" $(((border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ')|"
-echo "|$(printf "%*s" $(((border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ') $intro_desc2 $(printf "%*s" $(((border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ')|"
-echo "|$(printf "%*s" $((border_width - 2)) | tr ' ' ' ')|"
-echo "$border_line"
+echo "$intro_border_line"
+echo "|$(printf "%*s" $((intro_border_width - 2)) | tr ' ' ' ')|"
+echo "|$(printf "%*s" $(((intro_border_width - ${#intro_title}) / 2)) | tr ' ' ' ') $intro_title $(printf "%*s" $(((intro_border_width - ${#intro_title}) / 2)) | tr ' ' ' ')|"
+echo "|$(printf "%*s" $((intro_border_width - 2)) | tr ' ' ' ')|"
+echo "|$(printf "%*s" $(((intro_border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ') $intro_desc1 $(printf "%*s" $(((intro_border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ')|"
+echo "|$(printf "%*s" $(((intro_border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ') $intro_desc2 $(printf "%*s" $(((intro_border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ')|"
+echo "|$(printf "%*s" $((intro_border_width - 2)) | tr ' ' ' ')|"
+echo "$intro_border_line"
 echo ""
 logger info "Initializing your awesome new system..."
 sleep 1
