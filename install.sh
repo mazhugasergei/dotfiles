@@ -15,38 +15,17 @@ if ! sudo -n true 2>/dev/null; then
 fi
 
 # Nice looking intro
-intro_title="🎉 WELCOME TO YOUR NEW SYSTEM SETUP! 🎉"
-intro_desc1="✨ Let's transform this fresh OS into your perfect dev machine! ✨"
-intro_desc2="🚀 Installing all the tools you need to start creating! 🚀"
-
-# Calculate maximum length for dynamic border
-intro_max_length=${#intro_title}
-if [ ${#intro_desc1} -gt $intro_max_length ]; then
-	intro_max_length=${#intro_desc1}
-fi
-if [ ${#intro_desc2} -gt $intro_max_length ]; then
-	intro_max_length=${#intro_desc2}
-fi
-
-# Add padding (2 spaces on each side)
-intro_border_width=$((intro_max_length + 4))
-
-# Create dynamic border
-intro_border_line="+$(printf '%.0s' $(seq 1 $((intro_border_width - 2))) | tr ' ' '-')+"
-intro_empty_line=$(printf "| %.0s|" $(seq 1 $((intro_border_width - 2))))
+intro_lines = (
+	"Right, let's have a look at this absolute shambles, then.",
+	"I shall be transforming this appalling OS into a world-class workstation, easy days.",
+	"A cheeky little install? Don't mind if I do..."
+)
 
 echo ""
-echo "$intro_border_line"
-echo "|$(printf "%*s" $((intro_border_width - 2)) | tr ' ' ' ')|"
-echo "|$(printf "%*s" $(((intro_border_width - ${#intro_title}) / 2)) | tr ' ' ' ') $intro_title $(printf "%*s" $(((intro_border_width - ${#intro_title}) / 2)) | tr ' ' ' ')|"
-echo "|$(printf "%*s" $((intro_border_width - 2)) | tr ' ' ' ')|"
-echo "|$(printf "%*s" $(((intro_border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ') $intro_desc1 $(printf "%*s" $(((intro_border_width - ${#intro_desc1}) / 2)) | tr ' ' ' ')|"
-echo "|$(printf "%*s" $(((intro_border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ') $intro_desc2 $(printf "%*s" $(((intro_border_width - ${#intro_desc2}) / 2)) | tr ' ' ' ')|"
-echo "|$(printf "%*s" $((intro_border_width - 2)) | tr ' ' ' ')|"
-echo "$intro_border_line"
+for line in "${intro_lines[@]}"; do
+	echo "> $line"
+done
 echo ""
-logger info "Initializing your awesome new system..."
-sleep 1
 
 # Logger object with dot notation methods
 logger() {
