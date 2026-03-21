@@ -14,18 +14,32 @@ if ! sudo -n true 2>/dev/null; then
 	logger done "Sudo access verified"
 fi
 
-# Nice looking intro
-intro_lines=(
-	"Right, let's have a look at this absolute shambles, then."
-	"I shall be transforming this appalling OS into a world-class workstation, easy days."
-	"A cheeky little install? Don't mind if I do..."
-)
+# Color Definitions
+GOLD='\033[1;33m'
+CYAN='\033[1;36m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
 
-echo ""
-for line in "${intro_lines[@]}"; do
-	echo "> $line"
-done
-echo ""
+# Typewriter Function
+# Usage: type_out "text" speed
+type_out() {
+  echo "$1" | while IFS= read -r -n1 char; do
+    printf "%s" "$char"
+    sleep "$2"
+  done
+  printf "\n"
+}
+
+# The Intro Reveal
+echo "${BOLD}------------------------------------------${NC}"
+type_out "${CYAN}Right, let’s have a look at this absolute shambles, then...${NC}" 0.05
+sleep 0.5
+
+type_out "${BOLD}I shall be transforming this appalling OS into a world-class workstation, easy days.${NC}" 0.03
+sleep 0.5
+
+type_out "${GOLD}A cheeky little install? Don't mind if I do...${NC}" 0.08
+echo "${BOLD}------------------------------------------${NC}"
 
 # Logger object with dot notation methods
 logger() {
