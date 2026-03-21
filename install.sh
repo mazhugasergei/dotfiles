@@ -5,10 +5,15 @@ set -e
 # Parse command line arguments
 SKIP_INTRO=false
 INSTALLATION_ERROR=false
+FORCE_ERROR=false
 while [[ $# -gt 0 ]]; do
 	case "$1" in
 		-s|--skip)
 			SKIP_INTRO=true
+			shift
+			;;
+		--errored)
+			FORCE_ERROR=true
 			shift
 			;;
 		-h|--help)
@@ -16,17 +21,19 @@ while [[ $# -gt 0 ]]; do
 			echo ""
 			echo "OPTIONS:"
 			echo "  -s, --skip         Skip the intro and outro typewriter effects"
+			echo "      --errored      Force error condition for testing error outro"
 			echo "  -h, --help         Show this help message"
 			echo ""
 			echo "Examples:"
-			echo "  $0                    Run full installation with effects"
+			echo "  $0                   Run full installation with effects"
 			echo "  $0 -s                Skip effects and go straight to installation"
+			echo "  $0 --errored         Test errored behaviour"
 			echo ""
 			exit 0
 			;;
 		*)
 			echo "Unknown option: $1"
-			echo "Usage: $0 [-s|--skip] [-h|--help]"
+			echo "Usage: $0 [-s|--skip] [--errored] [-h|--help]"
 			exit 1
 			;;
 	esac
@@ -74,6 +81,12 @@ if [ "$SKIP_INTRO" = false ]; then
 	done
 	echo ""
 fi
+
+# Force error condition for testing
+if [ "$FORCE_ERROR" = true ]; then
+	logger error "Good heavens! An unknown error occurred during installation"
+	INSTALLATION_ERROR=true
+else
 
 # Logger object with dot notation methods
 logger() {
@@ -330,3 +343,5 @@ if [ "$SKIP_INTRO" = false ]; then
 	done
 	echo ""
 fi
+
+fi # Close the FORCE_ERROR else block
