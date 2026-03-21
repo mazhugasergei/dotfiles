@@ -4,6 +4,7 @@ set -e
 
 # Parse command line arguments
 SKIP_INTRO=false
+INSTALLATION_ERROR=false
 while [[ $# -gt 0 ]]; do
 	case "$1" in
 		-s|--skip)
@@ -216,33 +217,49 @@ if [ ${#to_install[@]} -gt 0 ]; then
 		case "$method" in
 			"apt")
 				logger info "Installing $package via apt..."
-				sudo apt-get install -yqq "$package"
+				if ! sudo apt-get install -yqq "$package"; then
+					INSTALLATION_ERROR=true
+				fi
 				logger done "$package installed"
 				;;
 			"custom")
 				case "$package" in
 					"docker")
 						logger info "Installing $package via official script..."
-						curl -fsSL https://get.docker.com -o get-docker.sh
-						sh get-docker.sh
-						sudo usermod -aG docker $USER
+						if ! curl -fsSL https://get.docker.com -o get-docker.sh; then
+							INSTALLATION_ERROR=true
+						fi
+						if ! sh get-docker.sh; then
+							INSTALLATION_ERROR=true
+						fi
+						if ! sudo usermod -aG docker $USER; then
+							INSTALLATION_ERROR=true
+						fi
 						rm get-docker.sh
 						logger done "$package installed"
 						;;
 					"node")
 						logger info "Installing $package via NodeSource..."
-						curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-						sudo apt-get install -yqq nodejs
+						if ! curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -; then
+							INSTALLATION_ERROR=true
+						fi
+						if ! sudo apt-get install -yqq nodejs; then
+							INSTALLATION_ERROR=true
+						fi
 						logger done "$package installed"
 						;;
 					"adguardvpn-cli")
 						logger info "Installing $package via official script..."
-						curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v
+						if ! curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v; then
+							INSTALLATION_ERROR=true
+						fi
 						logger done "$package installed"
 						;;
 					"uv")
 						logger info "Installing $package via official script..."
-						curl -sSfL https://astral.sh/uv/install.sh | sh
+						if ! curl -sSfL https://astral.sh/uv/install.sh | sh; then
+							INSTALLATION_ERROR=true
+						fi
 						logger done "$package installed"
 						;;
 				esac
@@ -290,11 +307,20 @@ fi
 # complete
 if [ "$SKIP_INTRO" = false ]; then
 	# The Outro
-	outro_strings=(
-		"Miraculous. It's almost as if a competent professional handled the setup."
-		"I've managed to save this rig from certain mediocrity. You're quite welcome."
-		"Everything is in its right place. Simply marvelous. Wallop."
-	)
+	if [ "$INSTALLATION_ERROR" = true ]; then
+		outro_strings=(
+			"> Well, this is a right old dog's dinner, isn't it?"
+			"> It appears your machine has rejected my superior efforts. Typical."
+			"> I've reached a bit of a sticky wicket. Absolute shambles."
+			"> I'm off for a sulk. Sort it out yourself. Toodle-loo!"
+		)
+	else
+		outro_strings=(
+			"> Miraculous. It's almost as if a competent professional handled the setup."
+			"> I've managed to save this rig from certain mediocrity. You're quite welcome."
+			"> Everything is in its right place. Simply marvelous. Wallop."
+		)
+	fi
 	
 	echo ""
 	sleep "$TYPE_LINES_DELAY"
