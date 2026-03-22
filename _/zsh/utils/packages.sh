@@ -178,10 +178,21 @@ install_node() {
 # Usage: install_adguardvpn_cli
 install_adguardvpn_cli() {
 	logger info "Installing adguardvpn-cli via official script..."
-	if ! curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- -v; then
+	if ! curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- 2>/dev/null; then
 		return 1
 	fi
 	logger done "adguardvpn-cli installed"
+	
+	# Source .zshrc to ensure adguardvpn-cli is in PATH
+	source "$HOME/.zshrc" 2>/dev/null || true
+	
+	# Configure AdGuard VPN to change system DNS
+	logger info "Configuring AdGuard VPN DNS settings..."
+	if ! adguardvpn-cli config set-change-system-dns on; then
+		logger warn "Failed to configure AdGuard VPN DNS settings"
+		return 1
+	fi
+	logger done "AdGuard VPN DNS configured"
 	return 0
 }
 
