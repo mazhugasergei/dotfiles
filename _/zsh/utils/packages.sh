@@ -5,6 +5,7 @@
 
 # Package lists
 apt_packages=(
+	"fastfetch"
 	"zsh"
 	"wget"
 	"curl"
@@ -51,81 +52,74 @@ check_package_status() {
 	done
 }
 
-# Calculate table dimensions for package display
-# Usage: calculate_table_dimensions
-# Returns: Sets global table width variables
-calculate_table_dimensions() {
-	# Find the longest package name
-	max_pkg_length=0
-	all_packages=("${!already_installed[@]}" "${!to_install[@]}")
-	for package in "${all_packages[@]}"; do
-		if [ ${#package} -gt $max_pkg_length ]; then
-			max_pkg_length=${#package}
-		fi
-	done
-
-	# Find the longest status string
-	status_strings=("Already installed" "To be installed")
-	max_status_length=0
-	for status in "${status_strings[@]}"; do
-		if [ ${#status} -gt $max_status_length ]; then
-			max_status_length=${#status}
-		fi
-	done
-
-	# Configuration for table formatting
-	table_pkg_col_min_width=23
-	table_status_col_min_width=17
-	table_method_col_min_width=8
-	table_col_padding=2
-
-	# Ensure minimum widths and add padding
-	declare -g table_pkg_col_width=$((max_pkg_length + table_col_padding))
-	declare -g table_status_col_width=$((max_status_length + table_col_padding))
-	declare -g table_method_col_width=$((table_method_col_min_width + table_col_padding))
-	
-	if [ $table_pkg_col_width -lt $table_pkg_col_min_width ]; then
-		table_pkg_col_width=$table_pkg_col_min_width
-	fi
-	if [ $table_status_col_width -lt $table_status_col_min_width ]; then
-		table_status_col_width=$table_status_col_min_width
-	fi
-}
-
 # Display package status table
 # Usage: display_package_table
 display_package_table() {
-	# Move cursor up one line and clear it to erase the "Checking package status..." message
-	echo -ne "\033[1A\033[K"
-	
-	# Show check completed message
-	logger done "package status check completed, see the results below"
-	
-	echo ""
-	calculate_table_dimensions
+  # Move cursor up and clear line
+  echo -ne "\033[1A\033[K"
+  logger done "package status check completed, see the results below"
+  echo ""
 
-	# Build table dynamically
-	table_top_border="┌─$(printf '─%.0s' $(seq 1 $table_pkg_col_width))─┬─$(printf '─%.0s' $(seq 1 $table_method_col_width))─┬─$(printf '─%.0s' $(seq 1 $table_status_col_width))─┐"
-	table_header="│ $(printf "%-${table_pkg_col_width}s" "Package Name") │ $(printf "%-${table_method_col_width}s" "Method") │ $(printf "%-${table_status_col_width}s" "Status") │"
-	table_middle_border="├─$(printf '─%.0s' $(seq 1 $table_pkg_col_width))─┼─$(printf '─%.0s' $(seq 1 $table_method_col_width))─┼─$(printf '─%.0s' $(seq 1 $table_status_col_width))─┤"
-	table_bottom_border="└─$(printf '─%.0s' $(seq 1 $table_pkg_col_width))─┴─$(printf '─%.0s' $(seq 1 $table_method_col_width))─┴─$(printf '─%.0s' $(seq 1 $table_status_col_width))─┘"
+  # CRITICAL: Use declare -A for associative arrays
+  declare -A table_titles
+  table_titles["pkg"]="Package Name"
+  table_titles["method"]="Method" 
+  table_titles["status"]="Status"
+  
+  status_strings=("✓ Already installed" "○ To be installed")
 
-	echo "$table_top_border"
-	echo "$table_header"
-	echo "$table_middle_border"
+  # 1. Calculate max widths (using 'wc -m' for accurate character counts)
+  all_packages=("${!already_installed[@]}" "${!to_install[@]}" "${table_titles[pkg]}")
+  max_pkg_length=0
+  for p in "${all_packages[@]}"; do
+    len=$(echo -n "$p" | wc -m)
+    (( len > max_pkg_length )) && max_pkg_length=$len
+  done
 
-	for package in "${!already_installed[@]}"; do
-		method="${already_installed[$package]}"
-		echo -e "│ $(printf "%-${table_pkg_col_width}s" "$package") │ $(printf "%-${table_method_col_width}s" "$method") │ \033[32m✓ Already installed\033[0m │"
-	done
+  max_method_length=15 # Hardcoded or calculated similarly to pkg
+  
+  # Status column needs careful handling due to Unicode symbols
+  max_status_length=0
+  for s in "${status_strings[@]}" "${table_titles[status]}"; do
+    len=$(echo -n "$s" | wc -m)
+    (( len > max_status_length )) && max_status_length=$len
+  done
 
-	for package in "${!to_install[@]}"; do
-		method="${to_install[$package]}"
-		echo "│ $(printf "%-${table_pkg_col_width}s" "$package") │ $(printf "%-${table_method_col_width}s" "$method") │ ○ To be installed  │"
-	done
+  # Helper function to print a padded row
+  print_row() {
+    local col1="$1"
+    local col2="$2"
+    local col3="$3"
+    local color="$4"
 
-	echo "$table_bottom_border"
-	echo ""
+    # Calculate padding for the status column manually to account for Unicode
+    local col3_len=$(echo -n "$col3" | wc -m)
+    local padding_count=$((max_status_length - col3_len))
+    local padding=$(printf '%*s' "$padding_count" "")
+
+    printf "│ %-${max_pkg_length}s │ %-${max_method_length}s │ %b%s%b%s │\n" \
+      "$col1" "$col2" "$color" "$col3" "\033[0m" "$padding"
+  }
+
+  # 2. Draw Table
+  local line_pkg=$(printf '─%.0s' $(seq 1 $((max_pkg_length + 2))))
+  local line_met=$(printf '─%.0s' $(seq 1 $((max_method_length + 2))))
+  local line_sta=$(printf '─%.0s' $(seq 1 $((max_status_length + 2))))
+
+  echo "┌${line_pkg}┬${line_met}┬${line_sta}┐"
+  print_row "${table_titles[pkg]}" "${table_titles[method]}" "${table_titles[status]}" ""
+  echo "├${line_pkg}┼${line_met}┼${line_sta}┤"
+
+  for package in "${!already_installed[@]}"; do
+    print_row "$package" "${already_installed[$package]}" "${status_strings[0]}" "\033[32m"
+  done
+
+  for package in "${!to_install[@]}"; do
+    print_row "$package" "${to_install[$package]}" "${status_strings[1]}" ""
+  done
+
+  echo "└${line_pkg}┴${line_met}┴${line_sta}┘"
+  echo ""
 }
 
 # Install packages using apt
