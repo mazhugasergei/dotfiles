@@ -127,9 +127,11 @@ display_package_table() {
 install_apt_package() {
 	local package="$1"
 	logger info "Installing $package via apt..."
-	if ! sudo apt-get install -yqq "$package"; then
+	if ! sudo apt-get install -yqq "$package" &> /dev/null; then
 		return 1
 	fi
+	# Move cursor up one line and clear it to overwrite the "Installing..." message
+	echo -ne "\033[1A\033[K"
 	logger done "$package installed"
 	return 0
 }
@@ -248,6 +250,13 @@ install_packages() {
 					;;
 			esac
 		done
+		
+		# Show completion log after all installations
+		if [ $install_error -eq 0 ]; then
+			logger done "All packages installed successfully"
+		else
+			logger warn "Some packages failed to install"
+		fi
 		
 		return $install_error
 	else
