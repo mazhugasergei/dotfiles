@@ -76,8 +76,14 @@ display_package_table() {
     (( len > max_pkg_length )) && max_pkg_length=$len
   done
 
-  max_method_length=15 # Hardcoded or calculated similarly to pkg
-  
+  # Calculate max method length dynamically
+  all_methods=("apt" "custom" "${table_titles[method]}")
+  max_method_length=0
+  for m in "${all_methods[@]}"; do
+    len=$(echo -n "$m" | wc -m)
+    (( len > max_method_length )) && max_method_length=$len
+  done
+
   # Status column needs careful handling due to Unicode symbols
   max_status_length=0
   for s in "${status_strings[@]}" "${table_titles[status]}"; do
