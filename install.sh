@@ -31,42 +31,41 @@ fi
 if [ "$FORCE_ERROR" = true ]; then
 	logger error "Good heavens! An unknown error occurred during installation"
 	INSTALLATION_ERROR=true
-else
 
-	# Package installation
-	if ! manage_packages; then
-		INSTALLATION_ERROR=true
-	fi
-
-	# System setup
-	if ! run_stow; then
-		INSTALLATION_ERROR=true
-	fi
-
-	if ! set_zsh_default; then
-		INSTALLATION_ERROR=true
-	fi
-
-	remove_bash_files
-
-	setup_fastfetch
-
-	# Source zshrc to apply changes immediately
-	if [ -f "$HOME/.zshrc" ]; then
-		logger info "applying shell configuration..."
-		source "$HOME/.zshrc"
-		clear_previous_line
-		logger done "shell configuration applied"
-	fi
-
-fi # Close the FORCE_ERROR else block
-
-# complete
-if [ "$SKIP" = false ]; then
 	# The Outro
-	if [ "$INSTALLATION_ERROR" = true ]; then
-		show_outro error
-	else
-		show_outro success
+	if [ "$SKIP" = false ]; then
+		if [ "$INSTALLATION_ERROR" = true ]; then
+			show_outro error
+		else
+			show_outro success
+		fi
 	fi
+
+	exit 1
+fi
+	
+# Package installation
+if ! manage_packages; then
+	INSTALLATION_ERROR=true
+fi
+
+# System setup
+if ! run_stow; then
+	INSTALLATION_ERROR=true
+fi
+
+if ! set_zsh_default; then
+	INSTALLATION_ERROR=true
+fi
+
+remove_bash_files
+
+setup_fastfetch
+
+# Source zshrc to apply changes immediately
+if [ -f "$HOME/.zshrc" ]; then
+	logger info "applying shell configuration..."
+	source "$HOME/.zshrc"
+	clear_previous_line
+	logger done "shell configuration applied"
 fi
