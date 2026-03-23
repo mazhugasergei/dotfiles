@@ -265,5 +265,3 @@ manage_packages() {
 
   echo ""
 }
-
-manage_packages

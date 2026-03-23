@@ -20,7 +20,6 @@ if ! check_sudo_privileges; then
 	exit 1
 fi
 
-
 # The Intro Reveal
 if [ "$SKIP_INTRO" = false ] && [ "$SKIP" = false ]; then
 	show_intro
