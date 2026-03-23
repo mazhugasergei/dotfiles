@@ -28,15 +28,27 @@ clear_previous_line() {
   echo -ne "\033[1A\033[K"
 }
 
+# Helper function to clear the entire table from the terminal
+clear_table() {
+  # The table has: 1 (check completed) + 1 (blank) + 3 (headers) + total pkgs + 1 (bottom border) + 1 (blank)
+  local total_pkgs=$((${#already_installed[@]} + ${#to_install[@]} + ${#errored_installs[@]} + ${#just_installed[@]}))
+  local lines_to_clear=$((total_pkgs + 7))
+  for ((i=0; i<lines_to_clear; i++)); do
+    clear_previous_line
+  done
+}
+
 # Helper function for "Live-Stream & Rollback" installation pattern
 install_with_rollback() {
   local package_name="$1"
   local install_cmd="$2"
-  local custom_done="${3:-installed}"
   local line_count=0
   
-  logger info "Installing $package_name..."
-  [[ "$package_name" == "package list" ]] && { clear_previous_line; logger info "Updating $package_name..."; }
+  if [[ "$package_name" == "package list" ]]; then
+    logger info "updating $package_name..."
+  else
+    logger info "installing $package_name..."
+  fi
   
   line_count=1
   local exit_code_file=$(mktemp)
@@ -52,21 +64,17 @@ install_with_rollback() {
   exit_code=$(cat "$exit_code_file")
   [[ -z "$exit_code" ]] && exit_code=1 
   
+  # Rollback terminal output
+  for ((i=0; i<line_count; i++)); do
+    clear_previous_line
+  done
+
   if [ "$exit_code" -eq 0 ]; then
-    for ((i=0; i<line_count; i++)); do
-      clear_previous_line
-    done
-    logger done "$package_name $custom_done"
     rm -f "$exit_code_file" "$log_file"
     return 0
   else
-    for ((i=0; i<line_count; i++)); do
-      clear_previous_line
-    done
-    
     logger error "$package_name installation failed"
     cat "$log_file"
-    
     rm -f "$exit_code_file" "$log_file"
     return 1
   fi
@@ -74,9 +82,11 @@ install_with_rollback() {
 
 # Check package status
 check_package_status() {
-  unset to_install already_installed
+  unset to_install already_installed errored_installs just_installed
   declare -gA to_install
   declare -gA already_installed
+  declare -gA errored_installs
+  declare -gA just_installed
 
   for package in "${apt_packages[@]}"; do
     if ! dpkg -l | grep -q "^ii  $package "; then
@@ -107,9 +117,9 @@ display_package_table() {
   table_titles["method"]="Method" 
   table_titles["status"]="Status"
   
-  status_strings=("✓ Already installed" "○ To be installed")
+  status_strings=("✓ Already installed" "○ To be installed" "✗ Errored" "✓ Just installed")
 
-  all_packages=("${!already_installed[@]}" "${!to_install[@]}" "${table_titles[pkg]}")
+  all_packages=("${!already_installed[@]}" "${!to_install[@]}" "${!errored_installs[@]}" "${!just_installed[@]}" "${table_titles[pkg]}")
   max_pkg_length=0
   for p in "${all_packages[@]}"; do
     len=$(echo -n "$p" | wc -m)
@@ -135,11 +145,18 @@ display_package_table() {
   print_row "${table_titles[pkg]}" "${table_titles[method]}" "${table_titles[status]}" ""
   echo "├${line_pkg}┼${line_met}┼${line_sta}┤"
 
-  for package in "${!already_installed[@]}"; do
-    print_row "$package" "${already_installed[$package]}" "${status_strings[0]}" "\033[32m"
+  # Sort by package name within groups for visual consistency
+  for package in $(echo "${!already_installed[@]}" | tr ' ' '\n' | sort); do
+    print_row "$package" "${already_installed[$package]}" "${status_strings[0]}" "\033[90m"
   done
-  for package in "${!to_install[@]}"; do
+  for package in $(echo "${!just_installed[@]}" | tr ' ' '\n' | sort); do
+    print_row "$package" "${just_installed[$package]}" "${status_strings[3]}" "\033[32m"
+  done
+  for package in $(echo "${!to_install[@]}" | tr ' ' '\n' | sort); do
     print_row "$package" "${to_install[$package]}" "${status_strings[1]}" ""
+  done
+  for package in $(echo "${!errored_installs[@]}" | tr ' ' '\n' | sort); do
+    print_row "$package" "${errored_installs[$package]}" "${status_strings[2]}" "\033[31m"
   done
   echo "└${line_pkg}┴${line_met}┴${line_sta}┘"
   echo ""
@@ -187,30 +204,40 @@ install_custom_package() {
 }
 
 install_packages() {
-  logger info "Installing missing packages..."
   local total_err=0
-  local lines_to_clear=1 # Starts with 1 for the "Installing missing packages..." line
+  
+  # Create a static list of keys to iterate over so we can modify the maps safely
+  local pkgs_to_process=("${!to_install[@]}")
 
-  for pkg in "${!to_install[@]}"; do
-    if [ "${to_install[$pkg]}" == "apt" ]; then
-      install_apt_package "$pkg" && ((lines_to_clear++)) || total_err=$((total_err + 1))
+  for pkg in "${pkgs_to_process[@]}"; do
+    local method="${to_install[$pkg]}"
+    local success=1
+
+    if [ "$method" == "apt" ]; then
+      install_apt_package "$pkg" && success=0
     else
-      install_custom_package "$pkg" && ((lines_to_clear++)) || total_err=$((total_err + 1))
+      install_custom_package "$pkg" && success=0
     fi
     
-    # If a package failed, the logs remain on screen, so we don't clear those lines later.
-    # However, 'lines_to_clear' only tracks successful DONE lines.
+    # Logic to move the package between associative arrays
+    if [ "$success" -eq 0 ]; then
+      just_installed["$pkg"]="$method"
+      unset to_install["$pkg"]
+    else
+      errored_installs["$pkg"]="$method"
+      unset to_install["$pkg"]
+      total_err=$((total_err + 1))
+    fi
+
+    # Redraw the table with updated statuses
+    clear_table
+    display_package_table
   done
   
   if [ "$total_err" -eq 0 ]; then
-    # Wipe the "Installing missing packages..." line + all "DONE" lines
-    for ((i=0; i<lines_to_clear; i++)); do
-      clear_previous_line
-    done
     logger done "All packages installed successfully"
     return 0
   else
-    # If errors occurred, we keep the logs for context
     logger warn "$total_err package(s) failed to install"
     return 1
   fi
@@ -221,7 +248,11 @@ manage_packages() {
   [[ "$PACKAGES_MANAGED" == "true" ]] && return 0
   export PACKAGES_MANAGED="true"
 
-  install_with_rollback "package list" "sudo apt-get update" "updated" || return 1
+  if install_with_rollback "package list" "sudo apt-get update"; then
+     logger done "package list updated successfully"
+  else
+     return 1
+  fi
   
   check_package_status
   
