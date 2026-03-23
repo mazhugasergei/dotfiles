@@ -2,6 +2,8 @@
 
 set -e
 
+clear
+
 # Source utilities
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 UTILS_DIR="$SCRIPT_DIR/_/zsh/utils"
