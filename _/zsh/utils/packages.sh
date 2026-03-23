@@ -24,6 +24,12 @@ non_apt_packages=(
 	"uv"
 )
 
+# Helper function to move cursor up one line and clear it
+# Usage: clear_previous_line
+clear_previous_line() {
+	echo -ne "\033[1A\033[K"
+}
+
 # Check package status and create installation plan
 # Usage: check_package_status
 # Returns: Sets global arrays to_install and already_installed
@@ -55,8 +61,7 @@ check_package_status() {
 # Display package status table
 # Usage: display_package_table
 display_package_table() {
-  # Move cursor up and clear line
-  echo -ne "\033[1A\033[K"
+  clear_previous_line
   logger done "package status check completed, see the results below"
   echo ""
 
@@ -136,8 +141,7 @@ install_apt_package() {
 	if ! sudo apt-get install -yqq "$package" &> /dev/null; then
 		return 1
 	fi
-	# Move cursor up one line and clear it to overwrite the "Installing..." message
-	echo -ne "\033[1A\033[K"
+	clear_previous_line
 	logger done "$package installed"
 	return 0
 }
@@ -162,18 +166,54 @@ install_docker() {
 	return 0
 }
 
-# Install Node.js
-# Usage: install_node
+# Install Node.js and npm via NVM (Avoids apt/sudo conflicts)
+# Usage: install_node [version_tag]
 install_node() {
-	logger info "Installing node via NodeSource..."
-	if ! curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -; then
-		return 1
-	fi
-	if ! sudo apt-get install -yqq nodejs; then
-		return 1
-	fi
-	logger done "node installed"
-	return 0
+  local NODE_VERSION=${1:-"--lts"}
+  
+  logger info "Checking for NVM (Node Version Manager)..."
+  
+  # 1. Install or Load NVM
+  if [ ! -d "$HOME/.nvm" ]; then
+    clear_previous_line
+    logger info "NVM not found. Installing..."
+    # Silent download and install, silencing the bash output entirely
+    curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash > /dev/null 2>&1
+  else
+    clear_previous_line
+    logger info "NVM already installed. Loading..."
+  fi
+
+  # Initialize NVM into current shell session
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+  # 2. Install Node and NPM
+  logger info "Installing Node.js ($NODE_VERSION)..."
+  
+  # Note: Removed quotes from $NODE_VERSION so --lts is passed as a flag
+  if nvm install $NODE_VERSION > /dev/null 2>&1; then
+    
+    # Determine the correct string for alias/use
+    local TARGET_VER=$NODE_VERSION
+    if [[ "$NODE_VERSION" == "--lts" ]]; then
+      TARGET_VER="lts/*"
+    fi
+
+    nvm use "$TARGET_VER" > /dev/null
+    nvm alias default "$TARGET_VER" > /dev/null
+    
+    local INSTALLED_NODE=$(node -v)
+    local INSTALLED_NPM=$(npm -v)
+    
+    clear_previous_line
+    logger done "Node $INSTALLED_NODE and npm $INSTALLED_NPM installed"
+    return 0
+  else
+    clear_previous_line
+    logger error "Node.js installation failed"
+    return 1
+  fi
 }
 
 # Install AdGuard VPN CLI
@@ -279,14 +319,12 @@ manage_packages() {
 	logger info "Updating package list..."
 	
 	if ! sudo apt-get update -qq; then
-		# Move cursor up one line and clear it to overwrite the previous message
-		echo -ne "\033[1A\033[K"
+		clear_previous_line
 		logger error "package list update failed"
 		return 1
 	fi
 	
-	# Move cursor up one line and clear it to overwrite the previous message
-	echo -ne "\033[1A\033[K"
+	clear_previous_line
 	logger done "package list updated"
 	
 	# Check package status
