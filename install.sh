@@ -51,6 +51,14 @@ else
 
 	setup_fastfetch
 
+	# Source zshrc to apply changes immediately
+	if [ -f "$HOME/.zshrc" ]; then
+		logger info "applying shell configuration..."
+		source "$HOME/.zshrc"
+		clear_previous_line
+		logger done "shell configuration applied"
+	fi
+
 fi # Close the FORCE_ERROR else block
 
 # complete
