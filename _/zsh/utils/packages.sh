@@ -107,7 +107,7 @@ check_package_status() {
 
 # Display package status table
 display_package_table() {
-  logger info "Checking package status..."
+  logger info "checking package status..."
   clear_previous_line
   logger done "package status check completed"
   echo ""
@@ -235,7 +235,7 @@ install_packages() {
   done
   
   if [ "$total_err" -eq 0 ]; then
-    logger done "All packages installed successfully"
+    logger done "all packages installed successfully"
     return 0
   else
     logger warn "$total_err package(s) failed to install"
@@ -260,7 +260,7 @@ manage_packages() {
     display_package_table
     install_packages
   else
-    logger done "All packages are already installed"
+    logger done "all packages are already installed"
   fi
 
   echo ""

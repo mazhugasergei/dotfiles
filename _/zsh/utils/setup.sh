@@ -11,7 +11,7 @@ run_stow() {
 	cd "$(dirname "${BASH_SOURCE[1]}")"  # Use the calling script's directory
 	
 	# Show initial log
-	logger info "Running stow..."
+	logger info "running stow..."
 	
 	# Move cursor up one line and clear it to overwrite the previous message
 	echo -ne "\033[1A\033[K"
@@ -33,7 +33,7 @@ run_stow() {
 # Returns: 0 on success, 1 on failure
 set_zsh_default() {
 	if [ "$SHELL" != "$(which zsh)" ]; then
-		logger info "Setting zsh as default shell..."
+		logger info "setting zsh as default shell..."
 		if ! sudo chsh -s $(which zsh) $USER; then
 			return 1
 		fi
