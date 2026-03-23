@@ -49,6 +49,8 @@ else
 
 	remove_bash_files
 
+	setup_fastfetch
+
 fi # Close the FORCE_ERROR else block
 
 # complete
