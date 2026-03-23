@@ -1,4 +1,4 @@
-alias whereami='curl ipinfo.io'
+alias whereami='curl http://ip-api.com/json'
 alias ls='ls -Ap1'
 alias mkcd='f() { mkdir -p "$1" && cd "$1"; }; f'
 alias open='explorer.exe'
