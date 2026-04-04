@@ -12,7 +12,7 @@ alias dcud='docker compose up --detach'
 alias dcub='docker compose up --build'
 alias dcubd='docker compose up --build --detach'
 alias npmise="npm install --save-exact"
-alias cna='npx create-next-app --empty'
+alias cna='npx create-next-app --empty --src-dir --react-compiler --no-eslint --no-agents-md'
 alias python=python3
 
 # windsurf
