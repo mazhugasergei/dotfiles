@@ -12,8 +12,17 @@ alias dcud='docker compose up --detach'
 alias dcub='docker compose up --build'
 alias dcubd='docker compose up --build --detach'
 alias npmise="npm install --save-exact"
-alias cna='npx create-next-app --empty --src-dir --react-compiler --no-eslint --no-agents-md'
 alias python=python3
+
+# create next app
+cna() {
+  if [ -z "$1" ]; then
+    echo "Error: Project name required"
+    echo "Usage: cna <project-name>"
+    return 1
+  fi
+  npx create-next-app "$1" --empty --ts --app --import-alias "@/*" --src-dir --tailwind --react-compiler --no-eslint --no-agents-md
+}
 
 # windsurf
 if [[ -n "$WSL_DISTRO_NAME" ]]; then
