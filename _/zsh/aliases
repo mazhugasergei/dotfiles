@@ -14,6 +14,21 @@ alias dcubd='docker compose up --build --detach'
 alias npmise="npm install --save-exact"
 alias python=python3
 
+# pin npm dependencies to exact versions
+npm-pin-deps() {
+  node -e '
+    const fs = require("fs");
+    const pkg = JSON.parse(fs.readFileSync("package.json"));
+    ["dependencies","devDependencies"].forEach(k=>{
+      if(!pkg[k]) return;
+      Object.keys(pkg[k]).forEach(p=>{
+        pkg[k][p]=pkg[k][p].replace(/^[\^~]/,"")
+      })
+    });
+    fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2));
+  ' && npm install
+}
+
 # create next app
 cna() {
   if [ -z "$1" ]; then
