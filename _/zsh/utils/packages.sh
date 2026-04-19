@@ -19,7 +19,6 @@ apt_packages=(
 non_apt_packages=(
   "docker"
   "node"
-  "adguardvpn-cli"
   "uv"
 )
 
