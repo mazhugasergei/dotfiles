@@ -186,10 +186,6 @@ install_node() {
   install_with_rollback "Node.js" "nvm install $NODE_VERSION && nvm use $TARGET_VER && nvm alias default $TARGET_VER"
 }
 
-install_adguardvpn_cli() {
-  install_with_rollback "adguardvpn-cli" "curl -fL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sh -s -- && adguardvpn-cli config set-change-system-dns on"
-}
-
 install_uv() {
   install_with_rollback "uv" "curl -fL https://astral.sh/uv/install.sh | sh"
 }
@@ -198,7 +194,6 @@ install_custom_package() {
   case "$1" in
     "docker") install_docker ;;
     "node") install_node ;;
-    "adguardvpn-cli") install_adguardvpn_cli ;;
     "uv") install_uv ;;
   esac
 }
