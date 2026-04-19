@@ -1,7 +1,7 @@
 ```bash
-chmod +x install.sh
+chmod +x ~/dotfiles/install.sh
 ```
 
 ```bash
-./install.sh
+~/dotfiles/install.sh
 ```
