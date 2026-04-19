@@ -24,7 +24,7 @@ if ! check_sudo_privileges; then
 fi
 
 # The Intro Reveal
-if [ "$SKIP_INTRO" = false ] && [ "$SKIP" = false ]; then
+if [ "$SHOW_EFFECTS" = true ]; then
 	show_intro
 fi
 
@@ -34,7 +34,7 @@ if [ "$FORCE_ERROR" = true ]; then
 	INSTALLATION_ERROR=true
 
 	# The Outro
-	if [ "$SKIP" = false ]; then
+	if [ "$SHOW_EFFECTS" = true ]; then
 		if [ "$INSTALLATION_ERROR" = true ]; then
 			show_outro error
 		else
@@ -69,4 +69,13 @@ if [ -f "$HOME/.zshrc" ]; then
 	source "$HOME/.zshrc"
 	clear_previous_line
 	logger done "shell configuration applied"
+fi
+
+# The Outro
+if [ "$SHOW_EFFECTS" = true ]; then
+	if [ "$INSTALLATION_ERROR" = true ]; then
+		show_outro error
+	else
+		show_outro success
+	fi
 fi
