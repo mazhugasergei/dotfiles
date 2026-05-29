@@ -57,3 +57,25 @@ else
   # native Linux: make simple alias
   alias ws='windsurf'
 fi
+
+# void
+if [[ -n "$WSL_DISTRO_NAME" ]]; then
+  # WSL: define vd() to launch void in VS Code Remote for the current WSL distro
+  vd() {
+    bash -c '
+      distro="Debian"
+      if [[ -n "$1" ]]; then
+        if [[ ! -d "$1" ]]; then
+          echo "Error: Directory \"$1\" does not exist"
+          exit 1
+        fi
+        void --folder-uri "vscode-remote://wsl+$distro$1"
+      else
+        void
+      fi
+    ' _ "${1:+$(realpath "$1")}"
+  }
+else
+  # native Linux: make simple alias
+  alias vd='void'
+fi
