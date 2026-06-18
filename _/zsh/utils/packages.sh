@@ -4,6 +4,7 @@
 
 # Package lists
 apt_packages=(
+  "btop"
   "fastfetch"
   "zsh"
   "wget"
