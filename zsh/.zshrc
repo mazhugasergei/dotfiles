@@ -8,4 +8,4 @@ export ZSHCONF="$HOME/dotfiles/_/zsh"
 [ -f $ZSHCONF/source.sh ] && source $ZSHCONF/source.sh
 [ -f $ZSHCONF/aliases.sh ] && source $ZSHCONF/aliases.sh
 
-# remove or replace what's below if appears
+# remove or replace what's below if appeared
