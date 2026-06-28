@@ -7,3 +7,5 @@ export ZSHCONF="$HOME/dotfiles/_/zsh"
 [ -f $ZSHCONF/path.sh ] && source $ZSHCONF/path.sh
 [ -f $ZSHCONF/source.sh ] && source $ZSHCONF/source.sh
 [ -f $ZSHCONF/aliases.sh ] && source $ZSHCONF/aliases.sh
+
+# remove or replace what's below if appears

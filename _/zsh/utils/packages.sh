@@ -15,6 +15,7 @@ apt_packages=(
   "gh"
   "python3"
   "python3-pip"
+  "pyenv"
 )
 
 non_apt_packages=(
