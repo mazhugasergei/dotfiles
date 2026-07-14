@@ -19,32 +19,35 @@ run_stow() {
 
 	for pkg in "${to_stow[@]}"; do
 		echo "Processing package: $pkg"
-		
-		# Try with --adopt to take ownership of existing files
-		if stow --restow --adopt --verbose=1 "$pkg" 2>&1 | tee -a stow.log; then
-			echo "✓ $pkg stowed successfully with --adopt"
-		else
-			echo "⚠ Retrying with force cleanup..."
-			stow --delete "$pkg" 2>/dev/null || true
+
+		# Aggressive cleanup of blocking files
+		if [ "$pkg" = "zsh" ]; then
+			echo "Cleaning zsh-related files..."
+			stow --delete zsh 2>/dev/null || true
 			
-			# Backup and remove blocking files
-			for f in .zshrc .zprofile .zlogin .zlogout .gitconfig; do
+			# Backup and remove any real .zsh* files
+			for f in .zshrc .zprofile .zlogin .zlogout; do
 				if [ -f "$HOME/$f" ] && [ ! -L "$HOME/$f" ]; then
-					mv -v "$HOME/$f" "$HOME/$f.bak_$(date +%s)" 2>/dev/null || true
+					echo "Backing up and removing $f"
+					mv -v "$HOME/$f" "$HOME/${f}.bak_$(date +%s)" || true
 				fi
 			done
-			
-			# Final attempt
-			if stow --restow --adopt "$pkg"; then
-				echo "✓ $pkg stowed after manual cleanup"
-			else
-				echo "✗ Still failing. Check stow.log"
-				cat stow.log
-				cd "$original_dir"
-				return 1
-			fi
+		fi
+
+		# Now stow with adopt + verbose
+		if stow --restow --adopt --verbose=1 "$pkg" 2>&1 | tee -a stow.log; then
+			echo "✓ $pkg stowed successfully"
+		else
+			echo "✗ Failed to stow $pkg"
+			cat stow.log
+			cd "$original_dir"
+			return 1
 		fi
 	done
+
+	# Force our version to win by re-stowing zsh at the end
+	echo "Final re-stow of zsh to ensure our version wins..."
+	stow --restow --adopt zsh
 
 	logger done "stow completed successfully"
 	cd "$original_dir"
