@@ -8,26 +8,45 @@
 # Returns: 0 on success, 1 on failure
 run_stow() {
 	local original_dir=$(pwd)
-	cd "$(dirname "${BASH_SOURCE[1]}")"  # Use the calling script's directory
-	
-	# Show initial log
+	cd "$(dirname "${BASH_SOURCE[1]}")"
+
 	logger info "running stow..."
-	
-	# Move cursor up one line and clear it to overwrite the previous message
 	echo -ne "\033[1A\033[K"
 
 	to_stow=(zsh git)
-	
-	# Use stow's --restow to automatically remove conflicting files/symlinks
-	# in the target directories before (re)stowing
-	if stow --restow "${to_stow[@]}"; then
-		logger done "stow completed successfully"
-	else
-		logger error "stow failed"
-		cd "$original_dir"
-		return 1
-	fi
-	
+
+	echo "=== Stow cleanup and restow ==="
+
+	for pkg in "${to_stow[@]}"; do
+		echo "Processing package: $pkg"
+		
+		# Try with --adopt to take ownership of existing files
+		if stow --restow --adopt --verbose=1 "$pkg" 2>&1 | tee -a stow.log; then
+			echo "✓ $pkg stowed successfully with --adopt"
+		else
+			echo "⚠ Retrying with force cleanup..."
+			stow --delete "$pkg" 2>/dev/null || true
+			
+			# Backup and remove blocking files
+			for f in .zshrc .zprofile .zlogin .zlogout .gitconfig; do
+				if [ -f "$HOME/$f" ] && [ ! -L "$HOME/$f" ]; then
+					mv -v "$HOME/$f" "$HOME/$f.bak_$(date +%s)" 2>/dev/null || true
+				fi
+			done
+			
+			# Final attempt
+			if stow --restow --adopt "$pkg"; then
+				echo "✓ $pkg stowed after manual cleanup"
+			else
+				echo "✗ Still failing. Check stow.log"
+				cat stow.log
+				cd "$original_dir"
+				return 1
+			fi
+		fi
+	done
+
+	logger done "stow completed successfully"
 	cd "$original_dir"
 	return 0
 }
