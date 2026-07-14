@@ -11,15 +11,11 @@ apt_packages=(
   "ca-certificates"
   "git"
   "gh"
-  "python3"
-  "python3-pip"
-  "pyenv"
 )
 
 non_apt_packages=(
   "docker"
   "node"
-  "uv"
 )
 
 # Helper function to move cursor up one line and clear it
