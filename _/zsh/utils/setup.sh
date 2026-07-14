@@ -73,28 +73,6 @@ remove_bash_files() {
 	return 0
 }
 
-# Remove zsh configuration files
-# Usage: remove_zsh_files
-# Returns: 0 always (just reports what was done)
-remove_zsh_files() {
-	local zsh_files=("$HOME/.zshrc" "$HOME/.zprofile" "$HOME/.zlogin" "$HOME/.zlogout" "$HOME/.zsh_history")
-	local files_removed=false
-
-	for file in "${zsh_files[@]}"; do
-		if [ -f "$file" ]; then
-			rm -f "$file"
-			files_removed=true
-		fi
-	done
-
-	if [ "$files_removed" = true ]; then
-		logger done "zsh files removed"
-	else
-		logger done "no zsh files found to remove"
-	fi
-	return 0
-}
-
 # Create fastfetch configuration
 # Usage: setup_fastfetch
 # Returns: 0 on success, 1 on failure
@@ -168,9 +146,6 @@ EOF
 # Returns: 0 on success, 1 on any failure
 complete_setup() {
 	local setup_error=0
-
-	# Remove zsh files
-	remove_zsh_files
 	
 	# Run stow
 	if ! run_stow; then
@@ -184,7 +159,7 @@ complete_setup() {
 	
 	# Remove bash files
 	remove_bash_files
-
+	
 	# Setup fastfetch configuration
 	if ! setup_fastfetch; then
 		setup_error=1
