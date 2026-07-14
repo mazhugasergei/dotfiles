@@ -6,10 +6,7 @@
 apt_packages=(
   "stow"
   "zsh"
-  "gh"
   "fastfetch"
-  "ca-certificates"
-  "git"
   "gh"
 )
 
