@@ -8,48 +8,29 @@
 # Returns: 0 on success, 1 on failure
 run_stow() {
 	local original_dir=$(pwd)
-	cd "$(dirname "${BASH_SOURCE[1]}")"
-
+	cd "$(dirname "${BASH_SOURCE[1]}")"  # Use the calling script's directory
+	
+	# Show initial log
 	logger info "running stow..."
+	
+	# Move cursor up one line and clear it to overwrite the previous message
 	echo -ne "\033[1A\033[K"
 
 	to_stow=(zsh git)
-
-	echo "=== Stow cleanup and restow ==="
-
-	for pkg in "${to_stow[@]}"; do
-		echo "Processing package: $pkg"
-
-		# Aggressive cleanup of blocking files
-		if [ "$pkg" = "zsh" ]; then
-			echo "Cleaning zsh-related files..."
-			stow --delete zsh 2>/dev/null || true
-			
-			# Backup and remove any real .zsh* files
-			for f in .zshrc .zprofile .zlogin .zlogout; do
-				if [ -f "$HOME/$f" ] && [ ! -L "$HOME/$f" ]; then
-					echo "Backing up and removing $f"
-					mv -v "$HOME/$f" "$HOME/${f}.bak_$(date +%s)" || true
-				fi
-			done
-		fi
-
-		# Now stow with adopt + verbose
-		if stow --restow --adopt --verbose=1 "$pkg" 2>&1 | tee -a stow.log; then
-			echo "✓ $pkg stowed successfully"
-		else
-			echo "✗ Failed to stow $pkg"
-			cat stow.log
-			cd "$original_dir"
-			return 1
-		fi
-	done
-
-	# Force our version to win by re-stowing zsh at the end
-	echo "Final re-stow of zsh to ensure our version wins..."
-	stow --restow --adopt zsh
-
-	logger done "stow completed successfully"
+	
+	# Remove conflicting files before stowing
+	rm -fv "$HOME/.zshrc" "$HOME/.zprofile" "$HOME/.zlogin" "$HOME/.zlogout" 2>/dev/null || true
+	rm -fv "$HOME/.gitconfig" "$HOME/.gitignore" 2>/dev/null || true
+	rm -rfv "$HOME/.config/zsh" "$HOME/.config/git" 2>/dev/null || true
+	
+	if stow "${to_stow[@]}"; then
+		logger done "stow completed successfully"
+	else
+		logger error "stow failed"
+		cd "$original_dir"
+		return 1
+	fi
+	
 	cd "$original_dir"
 	return 0
 }
