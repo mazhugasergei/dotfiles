@@ -4,13 +4,10 @@
 
 # Package lists
 apt_packages=(
-  "btop"
-  "fastfetch"
-  "zsh"
-  "wget"
-  "curl"
-  "ca-certificates"
   "stow"
+  "zsh"
+  "gh"
+  "ca-certificates"
   "git"
   "gh"
   "python3"
