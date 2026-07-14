@@ -15,8 +15,12 @@ run_stow() {
 	
 	# Move cursor up one line and clear it to overwrite the previous message
 	echo -ne "\033[1A\033[K"
+
+	to_stow=(zsh git)
 	
-	if stow zsh git; then
+	# Use stow's --restow to automatically remove conflicting files/symlinks
+	# in the target directories before (re)stowing
+	if stow --restow "${to_stow[@]}"; then
 		logger done "stow completed successfully"
 	else
 		logger error "stow failed"
