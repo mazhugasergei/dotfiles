@@ -61,8 +61,6 @@ fi
 
 remove_bash_files
 
-setup_fastfetch
-
 # Source zshrc to apply changes immediately
 if [ -f "$HOME/.zshrc" ]; then
 	logger info "applying shell configuration..."

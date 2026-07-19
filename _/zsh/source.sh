@@ -12,8 +12,3 @@ source_if_exists ~/.nvm/bash_completion
 
 # bun
 source_if_exists ~/.bun/_bun
-
-# pyenv
-eval "$(pyenv init --path)"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"

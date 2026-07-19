@@ -6,7 +6,6 @@
 apt_packages=(
   "stow"
   "zsh"
-  "fastfetch"
   "gh"
 )
 
