@@ -7,11 +7,10 @@ clear
 # Source utilities
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 UTILS_DIR="$SCRIPT_DIR/_/zsh/utils"
-source "$UTILS_DIR/args.sh"
 source "$UTILS_DIR/cursor.sh"
 source "$UTILS_DIR/logger.sh"
 source "$UTILS_DIR/packages.sh"
-source "$UTILS_DIR/setup.sh"
+source "$UTILS_DIR/config.sh"
 source "$UTILS_DIR/sudo.sh"
 
 # Parse command line arguments
