@@ -6,12 +6,6 @@
 apt_packages=(
   "stow"
   "zsh"
-  "gh"
-)
-
-non_apt_packages=(
-  "docker"
-  "node"
 )
 
 # Helper function to move cursor up one line and clear it
@@ -163,20 +157,6 @@ install_docker() {
   install_with_rollback "docker" "curl -fL https://get.docker.com -o get-docker.sh && sh get-docker.sh && sudo usermod -aG docker $USER && rm -f get-docker.sh"
 }
 
-install_node() {
-  local NODE_VERSION=${1:-"--lts"}
-  if [ ! -d "$HOME/.nvm" ]; then
-    install_with_rollback "NVM" "curl -fL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash" || return 1
-  fi
-  export NVM_DIR="$HOME/.nvm"
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  
-  local TARGET_VER=$NODE_VERSION
-  [[ "$NODE_VERSION" == "--lts" ]] && TARGET_VER="lts/*"
-  
-  install_with_rollback "Node.js" "nvm install $NODE_VERSION && nvm use $TARGET_VER && nvm alias default $TARGET_VER"
-}
-
 install_uv() {
   install_with_rollback "uv" "curl -fL https://astral.sh/uv/install.sh | sh"
 }
@@ -184,7 +164,6 @@ install_uv() {
 install_custom_package() {
   case "$1" in
     "docker") install_docker ;;
-    "node") install_node ;;
     "uv") install_uv ;;
   esac
 }
