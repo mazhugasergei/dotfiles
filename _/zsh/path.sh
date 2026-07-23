@@ -10,9 +10,9 @@ add_to_path() {
 add_to_path /snap/bin
 add_to_path ~/.local/bin
 add_to_path ~/.pyenv/bin
-[ -d ~/.pyenv ] && eval "$(pyenv init - zsh)"
+# [ -d ~/.pyenv ] && eval "$(pyenv init - zsh)"
 add_to_path ~/.bun/bin
-add_to_path ~/.cargo/bin
+add_to_path ~/.cargo/bin # Rust Package Manager
 
 # cleanup
 unset -f add_to_path

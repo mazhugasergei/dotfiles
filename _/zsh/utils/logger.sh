@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Logger Utilities
-# Provides colored logging functionality with dot notation methods
-
-# Logger object with dot notation methods
 # Usage: logger <method> <message>
 # Methods: info, done, error, warn
 logger() {

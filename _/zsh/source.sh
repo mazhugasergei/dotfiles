@@ -1,4 +1,3 @@
-# helper function to source files if they exist
 source_if_exists() {
   [ -s "$1" ] && source "$1"
 }

@@ -9,7 +9,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 UTILS_DIR="$SCRIPT_DIR/_/zsh/utils"
 source "$UTILS_DIR/args.sh"
 source "$UTILS_DIR/cursor.sh"
-source "$UTILS_DIR/intro.sh"
 source "$UTILS_DIR/logger.sh"
 source "$UTILS_DIR/packages.sh"
 source "$UTILS_DIR/setup.sh"
@@ -20,28 +19,6 @@ parse_arguments "$@"
 
 # Check for sudo privileges
 if ! check_sudo_privileges; then
-	exit 1
-fi
-
-# The Intro Reveal
-if [ "$SHOW_EFFECTS" = true ]; then
-	show_intro
-fi
-
-# Force error condition for testing
-if [ "$FORCE_ERROR" = true ]; then
-	logger error "Good heavens! An unknown error occurred during installation"
-	INSTALLATION_ERROR=true
-
-	# The Outro
-	if [ "$SHOW_EFFECTS" = true ]; then
-		if [ "$INSTALLATION_ERROR" = true ]; then
-			show_outro error
-		else
-			show_outro success
-		fi
-	fi
-
 	exit 1
 fi
 	
@@ -67,13 +44,4 @@ if [ -f "$HOME/.zshrc" ]; then
 	source "$HOME/.zshrc"
 	clear_previous_line
 	logger done "shell configuration applied"
-fi
-
-# The Outro
-if [ "$SHOW_EFFECTS" = true ]; then
-	if [ "$INSTALLATION_ERROR" = true ]; then
-		show_outro error
-	else
-		show_outro success
-	fi
 fi

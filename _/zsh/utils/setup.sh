@@ -1,10 +1,6 @@
 #!/bin/bash
 
-# System Setup Utilities
-# Provides functions for stow configuration and shell setup
-
 # Run stow to configure dotfiles
-# Usage: run_stow
 # Returns: 0 on success, 1 on failure
 run_stow() {
 	local original_dir=$(pwd)
@@ -36,7 +32,6 @@ run_stow() {
 }
 
 # Set zsh as the default shell
-# Usage: set_zsh_default
 # Returns: 0 on success, 1 on failure
 set_zsh_default() {
 	if [ "$SHELL" != "$(which zsh)" ]; then
@@ -52,7 +47,6 @@ set_zsh_default() {
 }
 
 # Remove bash configuration files
-# Usage: remove_bash_files
 # Returns: 0 always (just reports what was done)
 remove_bash_files() {
 	local bash_files=("$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile" "$HOME/.bash_logout" "$HOME/.bash_history")

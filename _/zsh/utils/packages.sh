@@ -153,21 +153,6 @@ install_apt_package() {
   install_with_rollback "$1" "sudo apt-get install -y $1"
 }
 
-install_docker() {
-  install_with_rollback "docker" "curl -fL https://get.docker.com -o get-docker.sh && sh get-docker.sh && sudo usermod -aG docker $USER && rm -f get-docker.sh"
-}
-
-install_uv() {
-  install_with_rollback "uv" "curl -fL https://astral.sh/uv/install.sh | sh"
-}
-
-install_custom_package() {
-  case "$1" in
-    "docker") install_docker ;;
-    "uv") install_uv ;;
-  esac
-}
-
 install_packages() {
   local total_err=0
   
