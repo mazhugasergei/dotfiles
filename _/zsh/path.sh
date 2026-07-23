@@ -12,7 +12,7 @@ add_to_path ~/.local/bin
 add_to_path ~/.pyenv/bin
 # [ -d ~/.pyenv ] && eval "$(pyenv init - zsh)"
 add_to_path ~/.bun/bin
-add_to_path ~/.cargo/bin # Rust Package Manager
+add_to_path ~/.cargo/bin # Rust Package Manager ; TODO: remove `. "$HOME/.cargo/env"` in .zshenv
 add_to_path /usr/local/go/bin
 
 # cleanup
