@@ -13,9 +13,6 @@ source "$UTILS_DIR/packages.sh"
 source "$UTILS_DIR/config.sh"
 source "$UTILS_DIR/sudo.sh"
 
-# Parse command line arguments
-parse_arguments "$@"
-
 # Check for sudo privileges
 if ! check_sudo_privileges; then
 	exit 1
